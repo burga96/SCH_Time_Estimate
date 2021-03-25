@@ -9,4 +9,11 @@
     <ProjectReference Include="..\Infrastructure\DataAccess\Core.Infrastructure.DataAccess.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="ApplicationDTOs\" />
+    <Folder Include="ApplicationServices\" />
+    <Folder Include="ApplicationServiceInterfaces\" />
+    <Folder Include="ExternalInterfaces\" />
+  </ItemGroup>
+
 </Project>
