@@ -1,0 +1,58 @@
+version: "2.4"
+
+services:
+  web_client:
+    build:
+      context: ./
+      dockerfile: ./Applications/WebClient/Dockerfile
+    image: sch_time_estimate/web_client:0.1
+    container_name: web_client
+    hostname: web_client
+    ports:
+      - 5000:80
+    networks:
+      - sch_time_estimate_net
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "test $$(curl -I http://localhost/health/status | grep HTTP/ | awk '{ print $$2 }') -eq '200'",
+        ]
+      interval: 20s
+      timeout: 10s
+      retries: 5
+    volumes:
+      - "./logs:/Logs"
+
+    depends_on:
+      sql_express:
+        condition: service_healthy
+
+  sql_express:
+    image: mcr.microsoft.com/mssql/server:2017-latest-ubuntu
+    container_name: sql_express
+    hostname: sql_express
+    ports:
+      - "1433:1433"
+    volumes:
+      - "sql_express_data:/var/opt/mssql"
+    networks:
+      - sch_time_estimate_net
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: SCH12345!
+      MSSQL_PID: Express
+
+    healthcheck:
+      test:
+        ["CMD", "/opt/mssql-tools/bin/sqlcmd", "-U", "sa", "-P", "SCH12345!"]
+      interval: 20s
+      timeout: 10s
+      start_period: 5s
+      retries: 5
+
+volumes:
+  sql_express_data:
+
+networks:
+  sch_time_estimate_net:
