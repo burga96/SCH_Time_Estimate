@@ -11,6 +11,11 @@ namespace Core.Infrastructure.DataAccess.EntityConfigurations
     {
         public void Configure(EntityTypeBuilder<Wallet> builder)
         {
+            builder.HasOne(Wallet => Wallet.SupportedBank);
+            builder.OwnsOne(Wallet => Wallet.PersonalData);
+            builder.OwnsOne(Wallet => Wallet.UniqueMasterCitizenNumber);
+
+            builder.Property(Wallet => Wallet.Password).IsRequired();
         }
     }
 }

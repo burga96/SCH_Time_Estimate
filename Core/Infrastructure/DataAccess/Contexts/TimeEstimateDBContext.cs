@@ -17,12 +17,14 @@ namespace Core.Infrastructure.DataAccess.Contexts
         #region Entities
 
         public DbSet<Wallet> Wallets { get; set; }
+        public DbSet<SupportedBank> SupportedBanks { get; set; }
 
         #endregion Entities
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfiguration(new WalletConfiguration());
+            modelBuilder.ApplyConfiguration(new SupportedBankConfiguration());
         }
     }
 }
