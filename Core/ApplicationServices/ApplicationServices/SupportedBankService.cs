@@ -96,6 +96,7 @@ namespace Core.ApplicationServices.ApplicationServices
                 throw new ArgumentException($"Supported bank with id {supportedBankId} does not exist");
             }
             await _unitOfWork.SupportedBankRepository.Delete(supportedBank);
+            await _unitOfWork.SaveChangesAsync();
             return new SupportedBankDTO(supportedBank);
         }
     }

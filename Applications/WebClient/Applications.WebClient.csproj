@@ -23,6 +23,14 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Views\SupportedBanks\" />
+    <Content Update="wwwroot\js\dataView\dateView.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\js\dataView\State.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\js\site.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 </Project>

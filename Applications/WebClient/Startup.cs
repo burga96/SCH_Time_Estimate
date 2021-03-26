@@ -2,8 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Core.ApplicationServices.ApplicationServiceInterfaces;
+using Core.ApplicationServices.ApplicationServices;
+using Core.Domain.RepositoryInterfaces;
 using Core.Domain.ValueObjects;
 using Core.Infrastructure.DataAccess.Contexts;
+using Core.Infrastructure.DataAccess.Repositories;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -32,9 +36,13 @@ namespace WebClient
                    options.UseSqlServer(Configuration.GetConnectionString("TimeEstimateDBConnection"))
                );
 
+            services.AddScoped<ISupportedBankService, SupportedBankService>();
+            services.AddScoped<IUnitOfWork, EfCoreUnitOfWork>();
+
             services.AddControllersWithViews(options =>
-                            options.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true
-                        ).AddRazorRuntimeCompilation();
+                options.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true
+            )
+            .AddRazorRuntimeCompilation();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

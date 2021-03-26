@@ -20,6 +20,10 @@ namespace Applications.WebClient.Models.ViewModel
             SupportedBankName = wallet.SupportedBankName;
         }
 
+        public WalletVM()
+        {
+        }
+
         public int Id { get; private set; }
         public string UniqueMasterCitizenNumber { get; set; }
         public string FirstName { get; set; }

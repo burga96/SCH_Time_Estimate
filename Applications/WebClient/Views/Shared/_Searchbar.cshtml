@@ -1,0 +1,14 @@
+﻿@model Applications.WebClient.Models.ViewModel.FilterVM
+
+<div class="row pb-5">
+    <div class="col-xs-offset-4 col-xs-8 col-sm-offset-5 col-sm-7 col-md-offset-7 col-md-5">
+        <div class="input-group">
+            <input type="text" class="form-control" placeholder="Search..." id="filter" value="@Model.SearchFilter" style="max-width: none" />
+            <div class="input-group-btn">
+                <button class="btn btn-primary" type="button" id="filter-button">
+                    <span class="glyphicon glyphicon-search">Search</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
