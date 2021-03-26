@@ -3,6 +3,7 @@ using Core.ApplicationServices.ApplicationDTOs;
 using Core.ApplicationServices.ApplicationServiceInterfaces;
 using Core.Domain.Entities;
 using Core.Domain.ExternalInterfaces;
+using Core.Domain.Factories;
 using Core.Domain.RepositoryInterfaces;
 using Core.Domain.ValueObjects;
 using Core.Infrastructure.DataAccess.Contexts;
@@ -51,8 +52,8 @@ namespace Core.ApplicationServices.ApplicationServices
             {
                 throw new Exception("UMCN not valid for platform");
             }
-
-            Wallet wallet = new Wallet(uniqueMasterCitizenNumberValue, supportedBank, firstName, lastName, "STEFAN");
+            string walletPassword = PasswordGenerator.WalletPassword();
+            Wallet wallet = new Wallet(uniqueMasterCitizenNumberValue, supportedBank, firstName, lastName, walletPassword);
             await _unitOfWork.WalletRepository.Insert(wallet);
             await _unitOfWork.SaveChangesAsync();
             return new WalletDTO(wallet);
