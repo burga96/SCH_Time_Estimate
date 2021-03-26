@@ -47,7 +47,7 @@ namespace Core.Domain.ValueObjects
         public bool IsRepublicOfSerbiaCitizen()
         {
             string region = Value.Substring(7, 2);
-            if (region[0] != '7' || region[0] != '8' || region[0] != '9')
+            if (region[0] != '7' && region[0] != '8' && region[0] != '9')
             {
                 return false;
             }

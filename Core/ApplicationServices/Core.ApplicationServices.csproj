@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
@@ -6,7 +6,11 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Domain\Core.Domain.csproj" />
+    <ProjectReference Include="..\Infrastructure\BancaIntesaAPI\BancaIntesaAPI.csproj" />
     <ProjectReference Include="..\Infrastructure\DataAccess\Core.Infrastructure.DataAccess.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="NewFolder\" />
+  </ItemGroup>
 </Project>
