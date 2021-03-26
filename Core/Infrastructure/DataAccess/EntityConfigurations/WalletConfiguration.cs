@@ -13,8 +13,9 @@ namespace Core.Infrastructure.DataAccess.EntityConfigurations
         {
             builder.HasOne(Wallet => Wallet.SupportedBank);
             builder.OwnsOne(Wallet => Wallet.PersonalData);
-            builder.OwnsOne(Wallet => Wallet.UniqueMasterCitizenNumber);
-
+            builder.OwnsOne(Wallet => Wallet.UniqueMasterCitizenNumber)
+                .HasIndex(UniqueMasterCitizenNumber => UniqueMasterCitizenNumber.Value)
+                .IsUnique();
             builder.Property(Wallet => Wallet.Password).IsRequired();
         }
     }

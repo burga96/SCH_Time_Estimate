@@ -91,9 +91,13 @@ namespace Core.Infrastructure.DataAccess.Migrations
                                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                             b1.Property<string>("Value")
-                                .HasColumnType("nvarchar(max)");
+                                .HasColumnType("nvarchar(450)");
 
                             b1.HasKey("WalletId");
+
+                            b1.HasIndex("Value")
+                                .IsUnique()
+                                .HasFilter("[UniqueMasterCitizenNumber_Value] IS NOT NULL");
 
                             b1.ToTable("Wallets");
 

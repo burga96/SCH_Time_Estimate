@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Core.Infrastructure.DataAccess.Migrations
 {
     [DbContext(typeof(TimeEstimateDBContext))]
-    [Migration("20210325233142_Initial")]
+    [Migration("20210326122018_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -93,9 +93,13 @@ namespace Core.Infrastructure.DataAccess.Migrations
                                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                             b1.Property<string>("Value")
-                                .HasColumnType("nvarchar(max)");
+                                .HasColumnType("nvarchar(450)");
 
                             b1.HasKey("WalletId");
+
+                            b1.HasIndex("Value")
+                                .IsUnique()
+                                .HasFilter("[UniqueMasterCitizenNumber_Value] IS NOT NULL");
 
                             b1.ToTable("Wallets");
 

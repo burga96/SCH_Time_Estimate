@@ -25,7 +25,7 @@ namespace Core.Infrastructure.DataAccess.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    UniqueMasterCitizenNumber_Value = table.Column<string>(nullable: false),
+                    UniqueMasterCitizenNumber_Value = table.Column<string>(nullable: true),
                     PersonalData_FirstName = table.Column<string>(nullable: true),
                     PersonalData_LastName = table.Column<string>(nullable: true),
                     SupportedBankId = table.Column<int>(nullable: false),
@@ -46,6 +46,13 @@ namespace Core.Infrastructure.DataAccess.Migrations
                 name: "IX_Wallets_SupportedBankId",
                 table: "Wallets",
                 column: "SupportedBankId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Wallets_UniqueMasterCitizenNumber_Value",
+                table: "Wallets",
+                column: "UniqueMasterCitizenNumber_Value",
+                unique: true,
+                filter: "[UniqueMasterCitizenNumber_Value] IS NOT NULL");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
