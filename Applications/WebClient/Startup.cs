@@ -36,6 +36,7 @@ namespace WebClient
                    options.UseSqlServer(Configuration.GetConnectionString("TimeEstimateDBConnection"))
                );
 
+            services.AddScoped<IWalletService, WalletService>();
             services.AddScoped<ISupportedBankService, SupportedBankService>();
             services.AddScoped<IUnitOfWork, EfCoreUnitOfWork>();
 

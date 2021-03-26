@@ -1,6 +1,7 @@
 ﻿using Core.ApplicationServices.ApplicationDTOs;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -25,12 +26,22 @@ namespace Applications.WebClient.Models.ViewModel
         }
 
         public int Id { get; private set; }
+
+        [Required]
         public string UniqueMasterCitizenNumber { get; set; }
+
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string FullName { get; set; }
+
+        [Required]
         public int SupportedBankId { get; set; }
+
+        [Required]
+        public string PostalIndexNumber { get; set; }
+
         public string SupportedBankName { get; set; }
+
         public string Password { get; set; }
     }
 
