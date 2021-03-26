@@ -1,6 +1,6 @@
-﻿function InitializeDataView(filter, columnName, isDescending, pageNumber, queryParameters) {
+﻿function InitializeDataView(filter, columnName, isDescending, pageNumber, adminPass, queryParameters) {
     // Fields
-    const state = new State(filter, columnName, isDescending, pageNumber, queryParameters);
+    const state = new State(filter, columnName, isDescending, pageNumber, adminPass, queryParameters);
 
     // Functions
 
@@ -14,6 +14,9 @@
 
         $("#filter-button").click(onFilterButtonClick);
         $("#filter").keypress(onFilterInputKeypress);
+
+        $("#admin-pass-text").keypress(onAdminPassKeypress);
+        $("#admin-pass-button").click(onAdminPassButtonClick);
 
         $(".page-link").click(onPageLinkClick);
 
@@ -37,7 +40,6 @@
     }
 
     // Event callbacks
-   
 
     function onOrderArrowUpClick($event) {
         const arrowElement = $event.currentTarget;
@@ -63,8 +65,18 @@
         const filter = document.getElementById("filter").value;
         state.ChangeFilter(filter);
     }
+    function onAdminPassButtonClick() {
+        const adminPass = document.getElementById("admin-pass-text").value;
+        state.ChangeAdminPass(adminPass);
+    }
 
     function onFilterInputKeypress($event) {
+        const keyCode = $event.which;
+        if (keyCode == 13) { // enter keycode
+            onFilterButtonClick();
+        }
+    }
+    function onAdminPassKeypress($event) {
         const keyCode = $event.which;
         if (keyCode == 13) { // enter keycode
             onFilterButtonClick();

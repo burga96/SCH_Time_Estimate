@@ -1,0 +1,73 @@
+﻿@model IEnumerable<Applications.WebClient.Models.ViewModel.WalletVM>
+
+@{
+    ViewData["Title"] = "Wallets";
+}
+
+<h4>Wallets</h4>
+
+<div style="display:flex">
+    <div class="col-md-4" >
+        <div class="form-group" style="float:left;">
+            <label class="control-label">Admin password</label>
+            <input type="text" id="admin-pass-text"
+                   value="@ViewBag.AdminPassword"
+                   class="form-control" />
+            <span id="admin-password-errror" class="text-danger">@ViewData["AdminPasswordError"]</span>
+        </div>
+        <div style="float:left; margin-left:10px; padding-top:30px">
+            <input type="submit" id="admin-pass-button"
+                   value="Enter" class="btn btn-primary" />
+        </div>
+    </div>
+</div>
+
+<div style="margin-top:10px; margin-bottom:10px">
+    <strong>Search wallets</strong>
+</div>
+
+
+@await Html.PartialAsync("_Searchbar", new Applications.WebClient.Models.ViewModel.FilterVM((string)ViewBag.Filter))
+
+<table class="table">
+    <thead>
+        <tr>
+            <th class="sort-column-header">
+                <div class="column-header-name">
+                    @Html.DisplayNameFor(model => model.FirstName)
+                </div>
+            </th>
+            <th class="sort-column-header">
+                <div class="column-header-name">
+                    @Html.DisplayNameFor(model => model.LastName)
+                </div>
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.FirstName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.LastName)
+                </td>
+                <td>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@await Html.PartialAsync("_Pagination", new Applications.WebClient.Models.ViewModel.PaginationVM((int)ViewBag.PageCount, (int)ViewBag.PageNumber, 2))
+
+@section Scripts{
+    <script src="~/js/dataView/State.js"></script>
+    <script src="~/js/dataView/dateView.js"></script>
+    <script>
+        InitializeDataView("@ViewBag.Filter", "@ViewBag.ColumnName", @ViewBag.IsDescendingString, @ViewBag.PageNumber,"@ViewBag.AdminPassword");
+    </script>
+}

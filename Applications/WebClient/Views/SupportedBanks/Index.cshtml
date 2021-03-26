@@ -6,10 +6,6 @@
 
 <h4>Supported banks</h4>
 
-<p>
-    <a asp-action="Create">Create new supported bank</a>
-</p>
-
 @await Html.PartialAsync("_Searchbar", new Applications.WebClient.Models.ViewModel.FilterVM((string)ViewBag.Filter))
 
 <table class="table">

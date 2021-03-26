@@ -74,8 +74,8 @@ namespace Core.ApplicationServices.ApplicationServices
                     skip,
                     take
                 );
-            List<SupportedBankDTO> businessActivities = resultsAndTotalCount.Results.ToSupportedBankDTOs().ToList();
-            return new ResultsAndTotalCount<SupportedBankDTO>(businessActivities, resultsAndTotalCount.TotalCount);
+            List<SupportedBankDTO> supportedBanks = resultsAndTotalCount.Results.ToSupportedBankDTOs().ToList();
+            return new ResultsAndTotalCount<SupportedBankDTO>(supportedBanks, resultsAndTotalCount.TotalCount);
         }
 
         public async Task<SupportedBankDTO> GetSupportedBankByIdAsync(int supportedBankId)

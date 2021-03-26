@@ -9,6 +9,8 @@ using Core.Domain.ValueObjects;
 using Core.Infrastructure.DataAccess.Contexts;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -57,6 +59,35 @@ namespace Core.ApplicationServices.ApplicationServices
             await _unitOfWork.WalletRepository.Insert(wallet);
             await _unitOfWork.SaveChangesAsync();
             return new WalletDTO(wallet);
+        }
+
+        public async Task<ResultsAndTotalCount<WalletDTO>> GetResultAndTotalCountWalletsAsync(string propertyValueContains,
+            OrderBySettings<Wallet> orderBySettings,
+            int skip, int take)
+        {
+            Expression<Func<Wallet, bool>> filterExpression;
+            if (string.IsNullOrEmpty(propertyValueContains))
+            {
+                filterExpression = null;
+            }
+            else
+            {
+                string uppercasePropertyValueContains = propertyValueContains.ToUpper();
+                filterExpression = Wallet
+                    => Wallet.PersonalData.FirstName.ToUpper().Contains(uppercasePropertyValueContains)
+                    || Wallet.PersonalData.LastName.ToUpper().Contains(uppercasePropertyValueContains);
+            }
+
+            ResultsAndTotalCount<Wallet> resultsAndTotalCount = await _unitOfWork
+                .WalletRepository
+                .GetResultsAndTotalCountAsync(
+                    filterExpression,
+                    orderBySettings,
+                    skip,
+                    take
+                );
+            List<WalletDTO> wallets = resultsAndTotalCount.Results.ToWalletDTOs().ToList();
+            return new ResultsAndTotalCount<WalletDTO>(wallets, resultsAndTotalCount.TotalCount);
         }
 
         private IBankAPI DeterminateBankAPI(SupportedBank supportedBank)

@@ -1,8 +1,9 @@
 ﻿class State {
-    constructor(filter, columnName, isDescending, pageNumber, queryParameters) {
+    constructor(filter, columnName, isDescending, pageNumber, adminPass, queryParameters) {
         this.Filter = filter;
         this.ColumnName = columnName;
         this.IsDescending = isDescending;
+        this.AdminPass = adminPass;
 
         this.PageNumber = (pageNumber === undefined || pageNumber === null)
             ? 1
@@ -14,6 +15,14 @@
     }
 
     // Methods
+    ChangeAdminPass(adminPass) {
+        if (this.AdminPass === adminPass) {
+            return;
+        }
+        this.AdminPass = adminPass;
+        this.PageNumber = 1;
+        this.LoadResults();
+    }
     ChangeFilter(filter) {
         if (this.Filter === filter) {
             return;
@@ -50,10 +59,14 @@
 
     LoadResults(additionalQueryParameters) {
         // additionalQueryParameters can be a string or an array
+        console.log(this.AdminPass);
         let queryParameters = Array.from(this.QueryParameters);
         if (this.Filter !== null && this.Filter.length > 0) {
             const uriEncodedFilterString = encodeURIComponent(this.Filter);
             queryParameters.push(`filter=${uriEncodedFilterString}`);
+        }
+        if (this.AdminPass != null && this.AdminPass.length > 0) {
+            queryParameters.push(`adminPass=${this.AdminPass}`);
         }
         if (this.ColumnName !== null && this.ColumnName.length > 0) {
             const uriEncodedColumnNameString = encodeURIComponent(this.ColumnName);
