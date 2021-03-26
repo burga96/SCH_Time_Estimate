@@ -42,7 +42,10 @@ namespace Applications.WebClient.Controllers
             }
             catch (Exception e)
             {
-                return View(e.Message);
+                IEnumerable<SupportedBankVM> supportedBankVMs = (await _supportedBankService.GetAllSupportedBanksAsync()).ToSupportedBankVMs();
+                var pageVM = new UpsertWalletVM(wallet, supportedBankVMs);
+                ViewData["Error"] = e.Message;
+                return View(pageVM);
             }
         }
 

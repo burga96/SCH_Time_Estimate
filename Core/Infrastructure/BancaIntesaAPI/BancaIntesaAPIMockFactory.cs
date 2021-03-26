@@ -10,8 +10,10 @@ namespace BancaIntesaAPI
         {
             var bankAPI = Mock.Of<IBankAPI>
             (
-                a => a.CheckStatus("2108996781057", "0612") == Task.FromResult(true)
+                bank => bank.CheckStatus("2108996781057", "0612") == Task.FromResult(true) &&
+                bank.CheckStatus("2108004781057", "0612") == Task.FromResult(true)
             );
+
             return bankAPI;
         }
     }

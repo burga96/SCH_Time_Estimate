@@ -50,7 +50,7 @@ namespace Core.ApplicationServices.ApplicationServices
             UniqueMasterCitizenNumber uniqueMasterCitizenNumber = new UniqueMasterCitizenNumber(uniqueMasterCitizenNumberValue);
             if (!uniqueMasterCitizenNumber.ValidForPlatform())
             {
-                throw new Exception("UMCN not valid for platform");
+                throw new Exception("Unique master citizen number not valid for platform");
             }
             string walletPassword = PasswordGenerator.WalletPassword();
             Wallet wallet = new Wallet(uniqueMasterCitizenNumberValue, supportedBank, firstName, lastName, walletPassword);
@@ -65,7 +65,7 @@ namespace Core.ApplicationServices.ApplicationServices
             {
                 return BancaIntesaAPIMockFactory.Create();
             }
-            throw new NotImplementedException();
+            throw new Exception("We don't have api from this bank");
         }
     }
 }
