@@ -4,26 +4,33 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Applications.WebClient.Helpers;
+using Applications.WebClient.Models;
 using Applications.WebClient.Models.ViewModel;
 using Core.ApplicationServices.ApplicationDTOs;
 using Core.ApplicationServices.ApplicationServiceInterfaces;
 using Core.Domain.Entities;
 using Core.Domain.ValueObjects;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 
 namespace Applications.WebClient.Controllers
 {
     public class SupportedBanksController : Controller
     {
         private readonly ISupportedBankService _supportedBankService;
+        private readonly string _adminPassword;
+
         private const int PageSize = 10;
 
-        public SupportedBanksController(ISupportedBankService supportedBankService)
+        public SupportedBanksController(ISupportedBankService supportedBankService,
+            IConfiguration configuration)
         {
+            _adminPassword = configuration["Wallet:AdminPassword"];
             _supportedBankService = supportedBankService;
         }
 
-        public async Task<IActionResult> Index(string filter = null,
+        public async Task<IActionResult> Index(string adminPassword,
+            string filter = null,
             string columnName = null,
             bool isDescending = false,
             int pageNumber = 1)
@@ -32,7 +39,17 @@ namespace Applications.WebClient.Controllers
             {
                 throw new ArgumentOutOfRangeException(nameof(pageNumber), "Must be a positive integer.");
             }
-
+            if (adminPassword != _adminPassword)
+            {
+                ViewData["AdminPasswordError"] = string.IsNullOrEmpty(adminPassword) ? "" : "Wrong admin password";
+                ViewBag.Filter = filter;
+                ViewBag.ColumnName = columnName;
+                ViewBag.PageNumber = pageNumber;
+                ViewBag.IsDescendingString = isDescending.ToString().ToLower();
+                ViewBag.PageCount = 0;
+                ViewBag.HasAdminPassword = false;
+                return View(new List<SupportedBankVM>());
+            }
             OrderBySettings<SupportedBank> orderBySettings;
             if (string.IsNullOrEmpty(columnName))
             {
@@ -57,64 +74,85 @@ namespace Applications.WebClient.Controllers
             ViewBag.PageNumber = pageNumber;
             ViewBag.IsDescendingString = isDescending.ToString().ToLower();
             ViewBag.PageCount = pageCount;
+            ViewBag.HasAdminPassword = true;
+            ViewBag.AdminPassword = adminPassword;
 
             IEnumerable<SupportedBankVM> supportedBankVMs = resultsAndTotalCountSupportedBanks.Results.ToSupportedBankVMs();
             return View(supportedBankVMs);
         }
 
         // GET: supportedBanks/Create
-        public IActionResult Create()
+        [HttpGet]
+        public IActionResult Create(string adminPassword)
         {
-            return View();
+            SupportedBankVM supportedBankVM = new SupportedBankVM();
+            supportedBankVM.HasAdminPassword = adminPassword == _adminPassword;
+            supportedBankVM.Password = adminPassword;
+            supportedBankVM.Error = supportedBankVM.HasAdminPassword ? "" : "Enter valid admin password";
+
+            return View(supportedBankVM);
         }
 
         // POST: supportedBanks/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(SupportedBankVM supportedBank)
         {
             try
             {
+                if (supportedBank.Password != _adminPassword)
+                {
+                    return RedirectToAction(nameof(Index));
+                }
                 await _supportedBankService.CreateSupportedBankAsync(supportedBank.Name);
                 return RedirectToAction(nameof(Index));
             }
             catch (Exception e)
             {
-                return View(e.Message);
+                return View("~/Views/Shared/Error.cshtml", new ErrorViewModel(e.Message));
             }
         }
 
         // GET: supportedBanks/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details(string adminPassword, int? id)
         {
             try
             {
+                if (id == null)
+                {
+                    return View("~/Views/Shared/Error.cshtml", new ErrorViewModel("Id not found"));
+                }
                 SupportedBankDTO supportedBankDTO = await _supportedBankService.GetSupportedBankByIdAsync(id.Value);
                 SupportedBankVM supportedBankVM = new SupportedBankVM(supportedBankDTO);
+                supportedBankVM.HasAdminPassword = adminPassword == _adminPassword;
+                supportedBankVM.Password = adminPassword;
+                supportedBankVM.Error = supportedBankVM.HasAdminPassword ? "" : "Enter valid admin password";
+
                 return View(supportedBankVM);
             }
             catch (Exception e)
             {
-                return View(e.Message);
+                return View("~/Views/Shared/Error.cshtml", new ErrorViewModel(e.Message));
             }
         }
 
         // GET: supportedBanks/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        public async Task<IActionResult> Edit(string adminPassword, int? id)
         {
-            string name = User.FindFirst("Name")?.Value;
-            ViewData["Name"] = name;
             try
             {
                 SupportedBankDTO supportedBankDTO = await _supportedBankService.GetSupportedBankByIdAsync(id.Value);
                 SupportedBankVM supportedBankVM = new SupportedBankVM(supportedBankDTO);
+                supportedBankVM.HasAdminPassword = adminPassword == _adminPassword;
+                supportedBankVM.Password = adminPassword;
+                supportedBankVM.Error = supportedBankVM.HasAdminPassword ? "" : "Enter valid admin password";
+
                 return View(supportedBankVM);
             }
             catch (Exception e)
             {
-                return View(e.Message);
+                return View("~/Views/Shared/Error.cshtml", new ErrorViewModel(e.Message));
             }
         }
 
@@ -125,32 +163,42 @@ namespace Applications.WebClient.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, SupportedBankVM supportedBank)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                try
-                {
-                    await _supportedBankService.UpdateSupportedBankAsync(id,
-                        supportedBank.Name);
-                    return RedirectToAction(nameof(Index));
-                }
-                catch (Exception e)
-                {
-                    return View(e.Message);
-                }
+                return View(supportedBank);
             }
-            return View(supportedBank);
+
+            try
+            {
+                if (supportedBank.Password != _adminPassword)
+                {
+                    supportedBank.HasAdminPassword = false;
+                    supportedBank.Error = "Enter valid admin password";
+                    return View(supportedBank);
+                }
+                await _supportedBankService.UpdateSupportedBankAsync(id,
+                    supportedBank.Name);
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception e)
+            {
+                return View("~/Views/Shared/Error.cshtml", new ErrorViewModel(e.Message));
+            }
         }
 
         // GET: supportedBanks/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        public async Task<IActionResult> Delete(string adminPassword, int? id)
         {
             if (id == null)
             {
-                return NotFound();
+                return View("~/Views/Shared/Error.cshtml", new ErrorViewModel("Id not found"));
             }
 
             SupportedBankDTO supportedBankDTO = await _supportedBankService.GetSupportedBankByIdAsync(id.Value);
             SupportedBankVM supportedBankVM = new SupportedBankVM(supportedBankDTO);
+            supportedBankVM.HasAdminPassword = adminPassword == _adminPassword;
+            supportedBankVM.Password = adminPassword;
+            supportedBankVM.Error = supportedBankVM.HasAdminPassword ? "" : "Enter valid admin password";
             return View(supportedBankVM);
         }
 
@@ -166,7 +214,7 @@ namespace Applications.WebClient.Controllers
             }
             catch (Exception e)
             {
-                return View(e.Message);
+                return View("~/Views/Shared/Error.cshtml", new ErrorViewModel(e.Message));
             }
         }
     }

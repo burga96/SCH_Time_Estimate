@@ -1,6 +1,7 @@
 ﻿using Core.ApplicationServices.ApplicationDTOs;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
@@ -28,10 +29,15 @@ namespace Applications.WebClient.Models.ViewModel
         public int Id { get; private set; }
 
         [Required]
+        [DisplayName("Unique Master Citizen Number")]
         public string UniqueMasterCitizenNumber { get; set; }
 
+        [DisplayName("First name")]
         public string FirstName { get; set; }
+
+        [DisplayName("Last name")]
         public string LastName { get; set; }
+
         public string FullName { get; set; }
 
         [Required]
@@ -40,6 +46,7 @@ namespace Applications.WebClient.Models.ViewModel
         [Required]
         public string PostalIndexNumber { get; set; }
 
+        [DisplayName("Supported bank")]
         public string SupportedBankName { get; set; }
 
         public string Password { get; set; }

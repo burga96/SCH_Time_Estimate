@@ -1,6 +1,6 @@
-﻿function InitializeDataView(filter, columnName, isDescending, pageNumber, adminPass, queryParameters) {
+﻿function InitializeDataView(filter, columnName, isDescending, pageNumber, adminPassword, queryParameters) {
     // Fields
-    const state = new State(filter, columnName, isDescending, pageNumber, adminPass, queryParameters);
+    const state = new State(filter, columnName, isDescending, pageNumber, adminPassword, queryParameters);
 
     // Functions
 
@@ -62,8 +62,11 @@
     }
 
     function onFilterButtonClick() {
-        const filter = document.getElementById("filter").value;
-        state.ChangeFilter(filter);
+        const filterInput = document.getElementById("filter");
+        if (filterInput == null) {
+            return;
+        }
+        state.ChangeFilter(filterInput.value);
     }
     function onAdminPassButtonClick() {
         const adminPass = document.getElementById("admin-pass-text").value;

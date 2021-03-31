@@ -75,7 +75,9 @@ namespace Core.ApplicationServices.ApplicationServices
                 string uppercasePropertyValueContains = propertyValueContains.ToUpper();
                 filterExpression = Wallet
                     => Wallet.PersonalData.FirstName.ToUpper().Contains(uppercasePropertyValueContains)
-                    || Wallet.PersonalData.LastName.ToUpper().Contains(uppercasePropertyValueContains);
+                    || Wallet.PersonalData.LastName.ToUpper().Contains(uppercasePropertyValueContains)
+                    || Wallet.UniqueMasterCitizenNumber.Value.ToUpper().Contains(uppercasePropertyValueContains)
+                    || Wallet.SupportedBank.Name.ToUpper().Contains(uppercasePropertyValueContains);
             }
 
             ResultsAndTotalCount<Wallet> resultsAndTotalCount = await _unitOfWork
@@ -84,7 +86,8 @@ namespace Core.ApplicationServices.ApplicationServices
                     filterExpression,
                     orderBySettings,
                     skip,
-                    take
+                    take,
+                    Wallet => Wallet.SupportedBank
                 );
             List<WalletDTO> wallets = resultsAndTotalCount.Results.ToWalletDTOs().ToList();
             return new ResultsAndTotalCount<WalletDTO>(wallets, resultsAndTotalCount.TotalCount);

@@ -29,7 +29,7 @@
             <div class="form-group">
                 <label asp-for="@Model.Wallet.PostalIndexNumber" class="control-label"></label>
                 <input id="postal-index-number" asp-for="@Model.Wallet.PostalIndexNumber" class="form-control" />
-                <span id="postal-index-number-error"  class="text-danger"></span>
+                <span id="postal-index-number-error" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="@Model.Wallet.UniqueMasterCitizenNumber" class="control-label"></label>
@@ -41,6 +41,9 @@
             </div>
             <div class="text-danger">
                 @ViewData["Error"]
+            </div>
+            <div class="text-success">
+                @ViewData["Success"]
             </div>
         </form>
     </div>

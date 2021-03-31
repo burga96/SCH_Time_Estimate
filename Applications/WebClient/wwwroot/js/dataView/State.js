@@ -3,7 +3,7 @@
         this.Filter = filter;
         this.ColumnName = columnName;
         this.IsDescending = isDescending;
-        this.AdminPass = adminPass;
+        this.AdminPassword = adminPass;
 
         this.PageNumber = (pageNumber === undefined || pageNumber === null)
             ? 1
@@ -16,10 +16,10 @@
 
     // Methods
     ChangeAdminPass(adminPass) {
-        if (this.AdminPass === adminPass) {
+        if (this.AdminPassword === adminPass) {
             return;
         }
-        this.AdminPass = adminPass;
+        this.AdminPassword = adminPass;
         this.PageNumber = 1;
         this.LoadResults();
     }
@@ -59,14 +59,14 @@
 
     LoadResults(additionalQueryParameters) {
         // additionalQueryParameters can be a string or an array
-        console.log(this.AdminPass);
+        console.log(this.AdminPassword);
         let queryParameters = Array.from(this.QueryParameters);
         if (this.Filter !== null && this.Filter.length > 0) {
             const uriEncodedFilterString = encodeURIComponent(this.Filter);
             queryParameters.push(`filter=${uriEncodedFilterString}`);
         }
-        if (this.AdminPass != null && this.AdminPass.length > 0) {
-            queryParameters.push(`adminPass=${this.AdminPass}`);
+        if (this.AdminPassword != null && this.AdminPassword.length > 0) {
+            queryParameters.push(`adminPassword=${this.AdminPassword}`);
         }
         if (this.ColumnName !== null && this.ColumnName.length > 0) {
             const uriEncodedColumnNameString = encodeURIComponent(this.ColumnName);

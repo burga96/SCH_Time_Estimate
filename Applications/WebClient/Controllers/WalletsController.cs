@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Applications.WebClient.Helpers;
 using Applications.WebClient.Models.ViewModel;
+using Core.ApplicationServices.ApplicationDTOs;
 using Core.ApplicationServices.ApplicationServiceInterfaces;
 using Core.Domain.Entities;
 using Core.Domain.ValueObjects;
@@ -17,14 +18,14 @@ namespace Applications.WebClient.Controllers
     {
         private readonly IWalletService _walletService;
         private readonly ISupportedBankService _supportedBankService;
-        private readonly string _adminPass;
+        private readonly string _adminPassword;
         private const int PageSize = 10;
 
         public WalletsController(IWalletService walletService,
             ISupportedBankService supportedBankService,
             IConfiguration configuration)
         {
-            _adminPass = configuration["Wallet:AdminPass"];
+            _adminPassword = configuration["Wallet:AdminPassword"];
             _walletService = walletService;
             _supportedBankService = supportedBankService;
         }
@@ -43,12 +44,15 @@ namespace Applications.WebClient.Controllers
         {
             try
             {
-                await _walletService.CreateNewWallet(wallet.UniqueMasterCitizenNumber,
+                WalletDTO createdWallet = await _walletService.CreateNewWallet(wallet.UniqueMasterCitizenNumber,
                     wallet.PostalIndexNumber,
                     wallet.SupportedBankId,
                     wallet.FirstName,
                     wallet.LastName);
-                return RedirectToAction(nameof(Index));
+                IEnumerable<SupportedBankVM> supportedBankVMs = (await _supportedBankService.GetAllSupportedBanksAsync()).ToSupportedBankVMs();
+                var pageVM = new UpsertWalletVM(wallet, supportedBankVMs);
+                ViewData["Success"] = $"Your password is {createdWallet.Password}";
+                return View(pageVM);
             }
             catch (Exception e)
             {
@@ -59,7 +63,7 @@ namespace Applications.WebClient.Controllers
             }
         }
 
-        public async Task<IActionResult> Index(string adminPass,
+        public async Task<IActionResult> Index(string adminPassword,
             string filter = null,
             string columnName = null,
             bool isDescending = false,
@@ -69,15 +73,16 @@ namespace Applications.WebClient.Controllers
             {
                 throw new ArgumentOutOfRangeException(nameof(pageNumber), "Must be a positive integer.");
             }
-            if (adminPass != _adminPass)
+
+            if (adminPassword != _adminPassword)
             {
-                ViewData["AdminPasswordError"] = string.IsNullOrEmpty(adminPass) ? "" : "Wrong admin password";
+                ViewData["AdminPasswordError"] = string.IsNullOrEmpty(adminPassword) ? "" : "Wrong admin password";
                 ViewBag.Filter = filter;
                 ViewBag.ColumnName = columnName;
                 ViewBag.PageNumber = pageNumber;
                 ViewBag.IsDescendingString = isDescending.ToString().ToLower();
                 ViewBag.PageCount = 0;
-                ViewBag.AdminPassword = adminPass;
+                ViewBag.HasAdminPassword = false;
                 return View(new List<WalletVM>());
             }
             OrderBySettings<Wallet> orderBySettings;
@@ -89,8 +94,10 @@ namespace Applications.WebClient.Controllers
             {
                 Expression<Func<Wallet, object>> orderByExpression = columnName switch
                 {
-                    "FirstName" => _wallet => _wallet.PersonalData.FirstName,
-                    "LastName" => _wallet => _wallet.PersonalData.LastName,
+                    "First name" => _wallet => _wallet.PersonalData.FirstName,
+                    "Last name" => _wallet => _wallet.PersonalData.LastName,
+                    "Unique Master Citizen Number" => _wallet => _wallet.UniqueMasterCitizenNumber.Value,
+                    "Supported bank" => _wallet => _wallet.SupportedBank.Name,
 
                     _ => throw new NotImplementedException($"{nameof(columnName)} = {columnName}"),
                 };
@@ -98,7 +105,13 @@ namespace Applications.WebClient.Controllers
             }
             int skip = (pageNumber - 1) * PageSize;
 
-            var resultsAndTotalCountSupportedBanks = await _walletService.GetResultAndTotalCountWalletsAsync(filter, orderBySettings, skip, PageSize);
+            var resultsAndTotalCountSupportedBanks = await _walletService
+                .GetResultAndTotalCountWalletsAsync(filter,
+                    orderBySettings,
+                    skip,
+                    PageSize
+                );
+
             int pageCount = Utils.CalculatePageCount(resultsAndTotalCountSupportedBanks.TotalCount, PageSize);
 
             ViewBag.Filter = filter;
@@ -106,7 +119,8 @@ namespace Applications.WebClient.Controllers
             ViewBag.PageNumber = pageNumber;
             ViewBag.IsDescendingString = isDescending.ToString().ToLower();
             ViewBag.PageCount = pageCount;
-            ViewBag.AdminPassword = adminPass;
+            ViewBag.AdminPassword = adminPassword;
+            ViewBag.HasAdminPassword = true;
             IEnumerable<WalletVM> walletVMs = resultsAndTotalCountSupportedBanks.Results.ToWalletVMs();
             return View(walletVMs);
         }
