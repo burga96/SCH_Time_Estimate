@@ -1,0 +1,30 @@
+version: "2.4"
+
+services:
+  sql_express:
+    image: mcr.microsoft.com/mssql/server:latest
+    container_name: sql_express
+    hostname: sql_express
+    ports:
+      - "1433:1433"
+    volumes:
+      - "sch_time_estimate_data:/var/opt/mssql"
+    networks:
+      - sch_time_estimate_net
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: SCH12345!
+
+    healthcheck:
+      test:
+        ["CMD", "/opt/mssql-tools/bin/sqlcmd", "-U", "sa", "-P", "SCH12345!"]
+      interval: 20s
+      timeout: 10s
+      start_period: 5s
+      retries: 5
+
+volumes:
+  sch_time_estimate_data:
+
+networks:
+  sch_time_estimate_net:

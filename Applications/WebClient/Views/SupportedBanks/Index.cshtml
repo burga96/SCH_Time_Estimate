@@ -1,0 +1,54 @@
+﻿@model IEnumerable<Applications.WebClient.Models.ViewModel.SupportedBankVM>
+
+@{
+    ViewData["Title"] = "Supported banks";
+}
+
+<h4>Supported banks</h4>
+
+@if (!ViewBag.HasAdminPassword)
+{
+    @await Html.PartialAsync("_AdminPassword", new Applications.WebClient.Models.ViewModel.AdminPasswordVM((string)ViewBag.AdminPassword, (string)ViewBag.AdminPasswordError, (bool)ViewBag.HasAdminPassword));
+}
+else
+{
+    <a href="/SupportedBanks/Create?adminPassword=@((string)ViewBag.AdminPassword)">Create supported bank</a>
+    @await Html.PartialAsync("_Searchbar", new Applications.WebClient.Models.ViewModel.FilterVM((string)ViewBag.Filter))
+    <table class="table">
+        <thead>
+            <tr>
+                <th class="sort-column-header">
+                    <div class="column-header-name">
+                        @Html.DisplayNameFor(model => model.Name)
+                    </div>
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Name)
+                    </td>
+                    <td>
+                        <a href="/SupportedBanks/Edit?adminPassword=@((string)ViewBag.AdminPassword)&id=@(item.Id)">Edit</a> |
+                        <a href="/SupportedBanks/Details?adminPassword=@((string)ViewBag.AdminPassword)&id=@(item.Id)">Details</a> |
+                        <a href="/SupportedBanks/Delete?adminPassword=@((string)ViewBag.AdminPassword)&id=@(item.Id)">Delete</a> |
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    @await Html.PartialAsync("_Pagination", new Applications.WebClient.Models.ViewModel.PaginationVM((int)ViewBag.PageCount, (int)ViewBag.PageNumber, 2))
+}
+
+@section Scripts{
+    <script src="~/js/dataView/State.js"></script>
+    <script src="~/js/dataView/dateView.js"></script>
+    <script>
+        InitializeDataView("@ViewBag.Filter", "@ViewBag.ColumnName", @ViewBag.IsDescendingString, @ViewBag.PageNumber, "@ViewBag.AdminPassword");
+    </script>
+}
