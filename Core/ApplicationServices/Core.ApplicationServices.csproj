@@ -9,8 +9,4 @@
     <ProjectReference Include="..\Infrastructure\BancaIntesaAPI\BancaIntesaAPI.csproj" />
     <ProjectReference Include="..\Infrastructure\DataAccess\Core.Infrastructure.DataAccess.csproj" />
   </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="NewFolder\" />
-  </ItemGroup>
 </Project>

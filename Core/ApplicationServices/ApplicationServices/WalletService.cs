@@ -1,5 +1,6 @@
 ﻿using BancaIntesaAPI;
 using Core.ApplicationServices.ApplicationDTOs;
+using Core.ApplicationServices.ApplicationExceptions;
 using Core.ApplicationServices.ApplicationServiceInterfaces;
 using Core.Domain.Entities;
 using Core.Domain.ExternalInterfaces;
@@ -34,25 +35,25 @@ namespace Core.ApplicationServices.ApplicationServices
             SupportedBank supportedBank = await _unitOfWork.SupportedBankRepository.GetById(supportedBankId);
             if (supportedBank == null)
             {
-                throw new Exception($"Supported bank with id {supportedBankId} does not exist");
+                throw new ArgumentException($"Supported bank with id {supportedBankId} does not exist");
             }
             IBankAPI bankAPI = DeterminateBankAPI(supportedBank);
             bool validStatus = await bankAPI.CheckStatus(uniqueMasterCitizenNumberValue, postalIndexNumber);
             if (!validStatus)
             {
-                throw new Exception("Bank api - invalid status");
+                throw new NotValidStatusFromBankAPIException("Bank api - invalid status");
             }
             Wallet existingWallet = await _unitOfWork.WalletRepository.GetFirstOrDefault(Wallet =>
                 Wallet.UniqueMasterCitizenNumber.Value == uniqueMasterCitizenNumberValue
             );
             if (existingWallet != null)
             {
-                throw new Exception("Wallet already exist with same UMCN");
+                throw new ExistingWalletException("Wallet already exist with same UMCN");
             }
             UniqueMasterCitizenNumber uniqueMasterCitizenNumber = new UniqueMasterCitizenNumber(uniqueMasterCitizenNumberValue);
             if (!uniqueMasterCitizenNumber.ValidForPlatform())
             {
-                throw new Exception("Unique master citizen number not valid for platform");
+                throw new NotValidUniqueMasterCitizenNumberException("Unique master citizen number not valid for platform");
             }
             string walletPassword = PasswordGenerator.WalletPassword();
             Wallet wallet = new Wallet(uniqueMasterCitizenNumberValue, supportedBank, firstName, lastName, walletPassword);
@@ -99,7 +100,7 @@ namespace Core.ApplicationServices.ApplicationServices
             {
                 return BancaIntesaAPIMockFactory.Create();
             }
-            throw new Exception("We don't have api from this bank");
+            throw new NotFoundBankAPIException("We don't have api from this bank");
         }
     }
 }
