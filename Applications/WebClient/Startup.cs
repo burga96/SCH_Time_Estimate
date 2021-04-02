@@ -4,6 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Core.ApplicationServices.ApplicationServiceInterfaces;
 using Core.ApplicationServices.ApplicationServices;
+using Core.ApplicationServices.ExternalInterfaces;
+using Core.Domain.ExternalInterfaces;
 using Core.Domain.RepositoryInterfaces;
 using Core.Domain.ValueObjects;
 using Core.Infrastructure.DataAccess.Contexts;
@@ -38,6 +40,9 @@ namespace WebClient
 
             services.AddScoped<IWalletService, WalletService>();
             services.AddScoped<ISupportedBankService, SupportedBankService>();
+            services.AddScoped<IPaymentTransactionService, PaymentTransactionService>();
+            services.AddScoped<IBankAPIDeterminator, BankAPIDeterminator>();
+
             services.AddScoped<IUnitOfWork, EfCoreUnitOfWork>();
 
             services.AddControllersWithViews(options =>

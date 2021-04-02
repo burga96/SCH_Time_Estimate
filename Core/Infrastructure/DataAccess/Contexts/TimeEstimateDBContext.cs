@@ -18,6 +18,7 @@ namespace Core.Infrastructure.DataAccess.Contexts
 
         public DbSet<Wallet> Wallets { get; set; }
         public DbSet<SupportedBank> SupportedBanks { get; set; }
+        public DbSet<PaymentTransaction> PaymentTransactions { get; set; }
 
         #endregion Entities
 
@@ -25,6 +26,9 @@ namespace Core.Infrastructure.DataAccess.Contexts
         {
             modelBuilder.ApplyConfiguration(new WalletConfiguration());
             modelBuilder.ApplyConfiguration(new SupportedBankConfiguration());
+            modelBuilder.ApplyConfiguration(new PaymentTransactionConfiguration());
+            modelBuilder.ApplyConfiguration(new DepositPaymentTransactionConfiguration());
+            modelBuilder.ApplyConfiguration(new WithdrawalPaymentTransactionConfiguration());
         }
     }
 }

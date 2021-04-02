@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Core.Infrastructure.DataAccess.Migrations
 {
@@ -25,6 +26,7 @@ namespace Core.Infrastructure.DataAccess.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    CurrentAmount = table.Column<decimal>(nullable: false),
                     UniqueMasterCitizenNumber_Value = table.Column<string>(nullable: true),
                     PersonalData_FirstName = table.Column<string>(nullable: true),
                     PersonalData_LastName = table.Column<string>(nullable: true),
@@ -42,6 +44,34 @@ namespace Core.Infrastructure.DataAccess.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "PaymentTransactions",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    WalletId = table.Column<int>(nullable: false),
+                    Amount = table.Column<decimal>(nullable: false),
+                    DateCreated = table.Column<DateTime>(nullable: false),
+                    Type = table.Column<int>(nullable: false),
+                    PaymentTransactionType = table.Column<string>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PaymentTransactions", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_PaymentTransactions_Wallets_WalletId",
+                        column: x => x.WalletId,
+                        principalTable: "Wallets",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PaymentTransactions_WalletId",
+                table: "PaymentTransactions",
+                column: "WalletId");
+
             migrationBuilder.CreateIndex(
                 name: "IX_Wallets_SupportedBankId",
                 table: "Wallets",
@@ -57,6 +87,9 @@ namespace Core.Infrastructure.DataAccess.Migrations
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "PaymentTransactions");
+
             migrationBuilder.DropTable(
                 name: "Wallets");
 

@@ -13,7 +13,49 @@ namespace BancaIntesaAPI
                 bank => bank.CheckStatus("2108996781057", "0612") == Task.FromResult(true) &&
                 bank.CheckStatus("2108004781057", "0612") == Task.FromResult(true) &&
                 bank.CheckStatus("2008996781057", "0613") == Task.FromResult(true) &&
-                bank.CheckStatus("1908996781057", "1213") == Task.FromResult(true)
+                bank.CheckStatus("1908996781057", "1213") == Task.FromResult(true) &&
+
+                bank.Deposit("2108996781057", "0612", 10) == Task.FromResult(true) &&
+                bank.Deposit("2108996781057", "0612", 20) == Task.FromResult(true) &&
+                bank.Deposit("2108996781057", "0612", 30) == Task.FromResult(true) &&
+                bank.Deposit("2108996781057", "0612", 40) == Task.FromResult(true) &&
+                bank.Deposit("2108996781057", "0612", 50) == Task.FromResult(true) &&
+                bank.Deposit("2108996781057", "0612", 60) == Task.FromResult(true) &&
+                bank.Deposit("2108996781057", "0612", 70) == Task.FromResult(true) &&
+                bank.Deposit("2108996781057", "0612", 80) == Task.FromResult(true) &&
+                bank.Deposit("2108996781057", "0612", 90) == Task.FromResult(true) &&
+                bank.Deposit("2108996781057", "0612", 100) == Task.FromResult(true) &&
+
+                bank.Withdraw("2108996781057", "0612", 10) == Task.FromResult(true) &&
+                bank.Withdraw("2108996781057", "0612", 20) == Task.FromResult(true) &&
+                bank.Withdraw("2108996781057", "0612", 30) == Task.FromResult(true) &&
+                bank.Withdraw("2108996781057", "0612", 40) == Task.FromResult(true) &&
+                bank.Withdraw("2108996781057", "0612", 50) == Task.FromResult(true) &&
+                bank.Withdraw("2108996781057", "0612", 60) == Task.FromResult(true) &&
+                bank.Withdraw("2108996781057", "0612", 70) == Task.FromResult(true) &&
+                bank.Withdraw("2108996781057", "0612", 80) == Task.FromResult(true) &&
+                bank.Withdraw("2108996781057", "0612", 90) == Task.FromResult(true) &&
+                bank.Withdraw("2108996781057", "0612", 100) == Task.FromResult(true) &&
+
+                bank.Deposit("2108996781057", "0612", 15) == Task.FromResult(false) &&
+                bank.Deposit("2108996781057", "0612", 25) == Task.FromResult(false) &&
+                bank.Deposit("2108996781057", "0612", 35) == Task.FromResult(false) &&
+                bank.Deposit("2108996781057", "0612", 45) == Task.FromResult(false) &&
+                bank.Deposit("2108996781057", "0612", 55) == Task.FromResult(false) &&
+                bank.Deposit("2108996781057", "0612", 65) == Task.FromResult(false) &&
+                bank.Deposit("2108996781057", "0612", 75) == Task.FromResult(false) &&
+                bank.Deposit("2108996781057", "0612", 85) == Task.FromResult(false) &&
+                bank.Deposit("2108996781057", "0612", 95) == Task.FromResult(false) &&
+
+                bank.Withdraw("2108996781057", "0612", 15) == Task.FromResult(false) &&
+                bank.Withdraw("2108996781057", "0612", 25) == Task.FromResult(false) &&
+                bank.Withdraw("2108996781057", "0612", 35) == Task.FromResult(false) &&
+                bank.Withdraw("2108996781057", "0612", 45) == Task.FromResult(false) &&
+                bank.Withdraw("2108996781057", "0612", 55) == Task.FromResult(false) &&
+                bank.Withdraw("2108996781057", "0612", 65) == Task.FromResult(false) &&
+                bank.Withdraw("2108996781057", "0612", 75) == Task.FromResult(false) &&
+                bank.Withdraw("2108996781057", "0612", 85) == Task.FromResult(false) &&
+                bank.Withdraw("2108996781057", "0612", 95) == Task.FromResult(false)
 
             );
 
