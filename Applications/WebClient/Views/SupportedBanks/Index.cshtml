@@ -8,7 +8,7 @@
 
 @if (!ViewBag.HasAdminPassword)
 {
-    @await Html.PartialAsync("_AdminPassword", new Applications.WebClient.Models.ViewModel.AdminPasswordVM((string)ViewBag.AdminPassword, (string)ViewBag.AdminPasswordError, (bool)ViewBag.HasAdminPassword));
+    @await Html.PartialAsync("_Password", new Applications.WebClient.Models.ViewModel.PasswordVM((string)ViewBag.AdminPassword, (string)ViewBag.AdminPasswordError, (bool)ViewBag.HasAdminPassword));
 }
 else
 {
@@ -33,9 +33,9 @@ else
                         @Html.DisplayFor(modelItem => item.Name)
                     </td>
                     <td>
-                        <a href="/SupportedBanks/Edit?adminPassword=@((string)ViewBag.AdminPassword)&id=@(item.Id)">Edit</a> |
-                        <a href="/SupportedBanks/Details?adminPassword=@((string)ViewBag.AdminPassword)&id=@(item.Id)">Details</a> |
-                        <a href="/SupportedBanks/Delete?adminPassword=@((string)ViewBag.AdminPassword)&id=@(item.Id)">Delete</a> |
+                        <a href="/SupportedBanks/Edit?password=@((string)ViewBag.AdminPassword)&id=@(item.Id)">Edit</a> |
+                        <a href="/SupportedBanks/Details?password=@((string)ViewBag.AdminPassword)&id=@(item.Id)">Details</a> |
+                        <a href="/SupportedBanks/Delete?password=@((string)ViewBag.AdminPassword)&id=@(item.Id)">Delete</a> |
                     </td>
                 </tr>
             }

@@ -18,6 +18,7 @@ namespace Applications.WebClient.Models.ViewModel
             FirstName = wallet.FirstName;
             LastName = wallet.LastName;
             FullName = wallet.FullName;
+            CurrentAmount = wallet.CurrentAmount;
             SupportedBankId = wallet.SupportedBankId;
             SupportedBankName = wallet.SupportedBankName;
         }
@@ -31,6 +32,9 @@ namespace Applications.WebClient.Models.ViewModel
         [Required]
         [DisplayName("Unique Master Citizen Number")]
         public string UniqueMasterCitizenNumber { get; set; }
+
+        [DisplayName("Current amount")]
+        public decimal CurrentAmount { get; set; }
 
         [DisplayName("First name")]
         public string FirstName { get; set; }

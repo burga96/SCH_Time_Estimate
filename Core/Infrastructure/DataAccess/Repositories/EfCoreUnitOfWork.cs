@@ -21,6 +21,7 @@ namespace Core.Infrastructure.DataAccess.Repositories
             Context = context;
             WalletRepository = new WalletRepository(context);
             SupportedBankRepository = new SupportedBankRepository(context);
+            PaymentTransactionRepository = new PaymentTransactionRepository(context);
         }
 
         #endregion Constructors
@@ -29,6 +30,7 @@ namespace Core.Infrastructure.DataAccess.Repositories
 
         public IWalletRepository WalletRepository { get; }
         public ISupportedBankRepository SupportedBankRepository { get; }
+        public IPaymentTransactionRepository PaymentTransactionRepository { get; }
 
         #endregion Properties
 

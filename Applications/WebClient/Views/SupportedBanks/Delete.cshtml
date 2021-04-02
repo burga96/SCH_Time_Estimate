@@ -6,9 +6,9 @@
 
 <h4>Supported banks</h4>
 
-@if (!Model.HasAdminPassword)
+@if (!Model.HasPassword)
 {
-    @await Html.PartialAsync("_AdminPassword", new Applications.WebClient.Models.ViewModel.AdminPasswordVM(Model.Password, Model.Error, Model.HasAdminPassword));
+    @await Html.PartialAsync("_Password", new Applications.WebClient.Models.ViewModel.PasswordVM(Model.Password, Model.Error, Model.HasPassword));
 }
 else
 {
@@ -24,7 +24,7 @@ else
 
         <form asp-action="Delete">
             <input type="hidden" asp-for="Id" />
-            <input type="submit" value="Delete" class="btn btn-danger" /> 
+            <input type="submit" value="Delete" class="btn btn-danger" />
         </form>
     </div>
 }

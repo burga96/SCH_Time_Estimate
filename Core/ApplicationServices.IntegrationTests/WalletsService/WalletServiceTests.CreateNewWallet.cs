@@ -2,6 +2,7 @@
 using Core.ApplicationServices.ApplicationExceptions;
 using Core.ApplicationServices.ApplicationServiceInterfaces;
 using Core.ApplicationServices.ApplicationServices;
+using Core.ApplicationServices.ExternalInterfaces;
 using Core.ApplicationServices.IntegrationTests.Common;
 using Core.Domain.RepositoryInterfaces;
 using Core.Infrastructure.DataAccess.Contexts;
@@ -26,9 +27,10 @@ namespace Core.ApplicationServices.IntegrationTests.WalletsService
         public void Setup()
         {
             var dbContextFactory = new SampleDbContextFactory();
+            var bankAPIDeterminator = new BankAPIDeterminator();
             _context = dbContextFactory.CreateDbContext(new string[] { });
             _unitOfWork = new EfCoreUnitOfWork(_context);
-            _walletService = new WalletService(_unitOfWork);
+            _walletService = new WalletService(_unitOfWork, bankAPIDeterminator);
         }
 
         [TestCleanup()]
@@ -59,6 +61,7 @@ namespace Core.ApplicationServices.IntegrationTests.WalletsService
             Assert.IsTrue(wallet.UniqueMasterCitizenNumber == uniqueMasterCitizenNumber);
             Assert.IsTrue(wallet.FirstName == firstName);
             Assert.IsTrue(wallet.LastName == lastName);
+            Assert.IsTrue(wallet.PostalIndexNumber == postalIndexNumber);
         }
 
         [DataRow("2108996781057", "0612", "Stefan", "Burgic", 10)]
@@ -95,7 +98,7 @@ namespace Core.ApplicationServices.IntegrationTests.WalletsService
         public void NotValidStatusOnCreatingWallet(string uniqueMasterCitizenNumber, string postalIndexNumber, string firstName, string lastName, int supportedBankId)
         {
             //Act && Assert
-            ExceptionAssert.Throws<NotValidStatusFromBankAPIException>(() => _walletService.CreateNewWallet(uniqueMasterCitizenNumber, postalIndexNumber, supportedBankId, firstName, lastName).Wait());
+            ExceptionAssert.Throws<BankAPIException>(() => _walletService.CreateNewWallet(uniqueMasterCitizenNumber, postalIndexNumber, supportedBankId, firstName, lastName).Wait());
         }
 
         [DataRow("2108996781057", "0612", "Stefan", "Burgic", 1)]

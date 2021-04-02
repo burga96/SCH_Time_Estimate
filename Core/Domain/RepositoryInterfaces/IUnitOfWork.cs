@@ -7,6 +7,7 @@ namespace Core.Domain.RepositoryInterfaces
     {
         IWalletRepository WalletRepository { get; }
         ISupportedBankRepository SupportedBankRepository { get; }
+        IPaymentTransactionRepository PaymentTransactionRepository { get; }
 
         Task SaveChangesAsync();
     }

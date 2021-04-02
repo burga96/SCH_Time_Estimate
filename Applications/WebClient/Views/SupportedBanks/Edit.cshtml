@@ -4,9 +4,9 @@
     ViewData["Title"] = "Edit supported bank";
 }
 <h4>Supported bank</h4>
-@if (!Model.HasAdminPassword)
+@if (!Model.HasPassword)
 {
-    @await Html.PartialAsync("_AdminPassword", new Applications.WebClient.Models.ViewModel.AdminPasswordVM(Model.Password, Model.Error, Model.HasAdminPassword));
+    @await Html.PartialAsync("_Password", new Applications.WebClient.Models.ViewModel.PasswordVM(Model.Password, Model.Error, Model.HasPassword));
 }
 else
 {

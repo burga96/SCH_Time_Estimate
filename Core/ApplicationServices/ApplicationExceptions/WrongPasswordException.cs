@@ -4,9 +4,9 @@ using System.Text;
 
 namespace Core.ApplicationServices.ApplicationExceptions
 {
-    public class NotValidStatusFromBankAPIException : Exception
+    public class WrongPasswordException : Exception
     {
-        public NotValidStatusFromBankAPIException(string message) : base(message)
+        public WrongPasswordException() : base("Wrong password")
         {
         }
     }

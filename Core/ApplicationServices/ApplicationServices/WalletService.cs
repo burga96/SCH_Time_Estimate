@@ -20,9 +20,12 @@ namespace Core.ApplicationServices.ApplicationServices
     public class WalletService : IWalletService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IBankAPIDeterminator _bankAPIDeterminator;
 
-        public WalletService(IUnitOfWork unitOfWork)
+        public WalletService(IUnitOfWork unitOfWork,
+            IBankAPIDeterminator bankAPIDeterminator)
         {
+            _bankAPIDeterminator = bankAPIDeterminator;
             _unitOfWork = unitOfWork;
         }
 
@@ -37,11 +40,11 @@ namespace Core.ApplicationServices.ApplicationServices
             {
                 throw new ArgumentException($"Supported bank with id {supportedBankId} does not exist");
             }
-            IBankAPI bankAPI = DeterminateBankAPI(supportedBank);
+            IBankAPI bankAPI = _bankAPIDeterminator.DeterminateBankAPI(supportedBank);
             bool validStatus = await bankAPI.CheckStatus(uniqueMasterCitizenNumberValue, postalIndexNumber);
             if (!validStatus)
             {
-                throw new NotValidStatusFromBankAPIException("Bank api - invalid status");
+                throw new BankAPIException("Bank api - invalid status");
             }
             Wallet existingWallet = await _unitOfWork.WalletRepository.GetFirstOrDefault(Wallet =>
                 Wallet.UniqueMasterCitizenNumber.Value == uniqueMasterCitizenNumberValue
@@ -56,9 +59,23 @@ namespace Core.ApplicationServices.ApplicationServices
                 throw new NotValidUniqueMasterCitizenNumberException("Unique master citizen number not valid for platform");
             }
             string walletPassword = PasswordGenerator.WalletPassword();
-            Wallet wallet = new Wallet(uniqueMasterCitizenNumberValue, supportedBank, firstName, lastName, walletPassword);
+            Wallet wallet = new Wallet(uniqueMasterCitizenNumberValue, supportedBank, firstName, lastName, walletPassword, postalIndexNumber);
             await _unitOfWork.WalletRepository.Insert(wallet);
             await _unitOfWork.SaveChangesAsync();
+            return new WalletDTO(wallet);
+        }
+
+        public async Task<WalletDTO> GetWalletByUniqueMasterCitizenNumberAndPassword(string uniqueMasterCitizenNumber, string password)
+        {
+            Wallet wallet = await _unitOfWork.WalletRepository.GetFirstWithIncludes(Wallet =>
+               Wallet.UniqueMasterCitizenNumber.Value == uniqueMasterCitizenNumber &&
+               Wallet.Password == password,
+               Wallet => Wallet.PaymentTransactions
+            );
+            if (wallet == null)
+            {
+                throw new ArgumentException($"Wallet with {uniqueMasterCitizenNumber} and {password} does not exist");
+            }
             return new WalletDTO(wallet);
         }
 
@@ -92,15 +109,6 @@ namespace Core.ApplicationServices.ApplicationServices
                 );
             List<WalletDTO> wallets = resultsAndTotalCount.Results.ToWalletDTOs().ToList();
             return new ResultsAndTotalCount<WalletDTO>(wallets, resultsAndTotalCount.TotalCount);
-        }
-
-        private IBankAPI DeterminateBankAPI(SupportedBank supportedBank)
-        {
-            if (supportedBank.Name.Equals("Banca Intesa"))
-            {
-                return BancaIntesaAPIMockFactory.Create();
-            }
-            throw new NotFoundBankAPIException("We don't have api from this bank");
         }
     }
 }

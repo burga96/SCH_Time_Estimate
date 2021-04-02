@@ -1,6 +1,6 @@
-﻿function InitializeDataView(filter, columnName, isDescending, pageNumber, adminPassword, queryParameters) {
+﻿function InitializeDataView(filter, columnName, isDescending, pageNumber, password, uniqueMasterCitizenNumber, queryParameters) {
     // Fields
-    const state = new State(filter, columnName, isDescending, pageNumber, adminPassword, queryParameters);
+    const state = new State(filter, columnName, isDescending, pageNumber, password, uniqueMasterCitizenNumber, queryParameters);
 
     // Functions
 
@@ -15,8 +15,9 @@
         $("#filter-button").click(onFilterButtonClick);
         $("#filter").keypress(onFilterInputKeypress);
 
-        $("#admin-pass-text").keypress(onAdminPassKeypress);
-        $("#admin-pass-button").click(onAdminPassButtonClick);
+        $("#unique-text").keypress(onUniqueKeypress);
+        $("#pass-text").keypress(onPassKeypress);
+        $("#pass-button").click(onPassButtonClick);
 
         $(".page-link").click(onPageLinkClick);
 
@@ -68,9 +69,11 @@
         }
         state.ChangeFilter(filterInput.value);
     }
-    function onAdminPassButtonClick() {
-        const adminPass = document.getElementById("admin-pass-text").value;
-        state.ChangeAdminPass(adminPass);
+    function onPassButtonClick() {
+        const pass = document.getElementById("pass-text").value;
+        const unique = document.getElementById("unique-text").value;
+        state.ChangeUniqueMasterCitizenNumber(unique);
+        state.ChangePassword(pass);
     }
 
     function onFilterInputKeypress($event) {
@@ -79,13 +82,18 @@
             onFilterButtonClick();
         }
     }
-    function onAdminPassKeypress($event) {
+    function onPassKeypress($event) {
         const keyCode = $event.which;
         if (keyCode == 13) { // enter keycode
-            onFilterButtonClick();
+            onPassButtonClick();
         }
     }
-
+    function onUniqueKeypress($event) {
+        const keyCode = $event.which;
+        if (keyCode == 13) { // enter keycode
+            onPassButtonClick();
+        }
+    }
     function onPageLinkClick($event) {
         const pageLinkElement = $event.currentTarget;
         const pageNumberString = $(pageLinkElement).text();

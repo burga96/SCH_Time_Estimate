@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Applications.WebClient.Models.ViewModel
 {
-    public class SupportedBankVM : AdminPasswordVM
+    public class SupportedBankVM : PasswordVM
     {
         public SupportedBankVM(SupportedBankDTO supportedBank)
         {

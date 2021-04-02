@@ -16,18 +16,25 @@ namespace Core.ApplicationServices.ApplicationDTOs
             FirstName = wallet.PersonalData.FirstName;
             LastName = wallet.PersonalData.LastName;
             FullName = wallet.PersonalData.FullName;
+            PostalIndexNumber = wallet.PostalIndexNumber;
+            CurrentAmount = wallet.CurrentAmount;
             SupportedBankId = wallet.SupportedBankId;
             SupportedBankName = wallet.SupportedBank?.Name;
+            PaymentTransactions = wallet.PaymentTransactions != null ? wallet.PaymentTransactions.ToPaymentTransactionDTOs() : new List<PaymentTransactionDTO>();
         }
 
         public int Id { get; private set; }
         public string UniqueMasterCitizenNumber { get; private set; }
+        public decimal CurrentAmount { get; private set; }
+
         public string FirstName { get; private set; }
         public string LastName { get; private set; }
         public string FullName { get; private set; }
         public int SupportedBankId { get; private set; }
         public string SupportedBankName { get; private set; }
         public string Password { get; private set; }
+        public string PostalIndexNumber { get; set; }
+        public IEnumerable<PaymentTransactionDTO> PaymentTransactions { get; private set; }
     }
 
     public static partial class WalletExtensionMethods

@@ -5,6 +5,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="Views\PaymentTransactions\MakeDeposit.cshtml" />
+    <Content Remove="Views\PaymentTransactions\MakeWithdrawal.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Views\PaymentTransactions\MakeWithdrawal.cshtml" />
+    <None Include="Views\PaymentTransactions\MakeDeposit.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="3.1.13" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.13" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="3.1.13">

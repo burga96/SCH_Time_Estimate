@@ -63,7 +63,7 @@ namespace Applications.WebClient.Controllers
             }
         }
 
-        public async Task<IActionResult> Index(string adminPassword,
+        public async Task<IActionResult> Index(string password,
             string filter = null,
             string columnName = null,
             bool isDescending = false,
@@ -74,9 +74,9 @@ namespace Applications.WebClient.Controllers
                 throw new ArgumentOutOfRangeException(nameof(pageNumber), "Must be a positive integer.");
             }
 
-            if (adminPassword != _adminPassword)
+            if (password != _adminPassword)
             {
-                ViewData["AdminPasswordError"] = string.IsNullOrEmpty(adminPassword) ? "" : "Wrong admin password";
+                ViewData["AdminPasswordError"] = string.IsNullOrEmpty(password) ? "" : "Wrong admin password";
                 ViewBag.Filter = filter;
                 ViewBag.ColumnName = columnName;
                 ViewBag.PageNumber = pageNumber;
@@ -98,6 +98,7 @@ namespace Applications.WebClient.Controllers
                     "Last name" => _wallet => _wallet.PersonalData.LastName,
                     "Unique Master Citizen Number" => _wallet => _wallet.UniqueMasterCitizenNumber.Value,
                     "Supported bank" => _wallet => _wallet.SupportedBank.Name,
+                    "Current amount" => _wallet => _wallet.CurrentAmount,
 
                     _ => throw new NotImplementedException($"{nameof(columnName)} = {columnName}"),
                 };
@@ -119,7 +120,7 @@ namespace Applications.WebClient.Controllers
             ViewBag.PageNumber = pageNumber;
             ViewBag.IsDescendingString = isDescending.ToString().ToLower();
             ViewBag.PageCount = pageCount;
-            ViewBag.AdminPassword = adminPassword;
+            ViewBag.AdminPassword = password;
             ViewBag.HasAdminPassword = true;
             IEnumerable<WalletVM> walletVMs = resultsAndTotalCountSupportedBanks.Results.ToWalletVMs();
             return View(walletVMs);
