@@ -8,7 +8,7 @@ namespace Core.ApplicationServices.ApplicationDTOs
 {
     public class DepositPaymentTransactionDTO : PaymentTransactionDTO
     {
-        public DepositPaymentTransactionDTO(WithdrawalPaymentTransaction paymentTransaction) : base(paymentTransaction)
+        public DepositPaymentTransactionDTO(DepositPaymentTransaction paymentTransaction) : base(paymentTransaction)
         {
         }
     }
