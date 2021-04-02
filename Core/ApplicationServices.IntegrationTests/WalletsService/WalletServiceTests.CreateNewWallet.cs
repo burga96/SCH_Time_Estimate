@@ -61,6 +61,7 @@ namespace Core.ApplicationServices.IntegrationTests.WalletsService
             Assert.IsTrue(wallet.UniqueMasterCitizenNumber == uniqueMasterCitizenNumber);
             Assert.IsTrue(wallet.FirstName == firstName);
             Assert.IsTrue(wallet.LastName == lastName);
+            Assert.IsTrue(wallet.PostalIndexNumber == postalIndexNumber);
         }
 
         [DataRow("2108996781057", "0612", "Stefan", "Burgic", 10)]

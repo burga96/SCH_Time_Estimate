@@ -11,12 +11,10 @@ namespace Core.ApplicationServices.ApplicationServiceInterfaces
     public interface IPaymentTransactionService
     {
         Task<DepositPaymentTransactionDTO> MakeDepositPaymentTransaction(string uniqueMasterCitizenNumberValue,
-            string postalIndexNumber,
             string password,
             decimal amount);
 
         Task<WithdrawalPaymentTransactionDTO> MakeWithdrawalPaymentTransaction(string uniqueMasterCitizenNumberValue,
-            string postalIndexNumber,
             string password,
             decimal amount);
     }

@@ -27,6 +27,7 @@ namespace Core.Infrastructure.DataAccess.Migrations
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     CurrentAmount = table.Column<decimal>(nullable: false),
+                    PostalIndexNumber = table.Column<string>(nullable: true),
                     UniqueMasterCitizenNumber_Value = table.Column<string>(nullable: true),
                     PersonalData_FirstName = table.Column<string>(nullable: true),
                     PersonalData_LastName = table.Column<string>(nullable: true),

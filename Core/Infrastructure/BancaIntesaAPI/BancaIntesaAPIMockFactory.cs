@@ -15,6 +15,7 @@ namespace BancaIntesaAPI
                 bank.CheckStatus("2008996781057", "0613") == Task.FromResult(true) &&
                 bank.CheckStatus("1908996781057", "1213") == Task.FromResult(true) &&
 
+                bank.Deposit("2108996781057", "0612", 5) == Task.FromResult(true) &&
                 bank.Deposit("2108996781057", "0612", 10) == Task.FromResult(true) &&
                 bank.Deposit("2108996781057", "0612", 20) == Task.FromResult(true) &&
                 bank.Deposit("2108996781057", "0612", 30) == Task.FromResult(true) &&
@@ -26,6 +27,7 @@ namespace BancaIntesaAPI
                 bank.Deposit("2108996781057", "0612", 90) == Task.FromResult(true) &&
                 bank.Deposit("2108996781057", "0612", 100) == Task.FromResult(true) &&
 
+                bank.Withdraw("2108996781057", "0612", 5) == Task.FromResult(true) &&
                 bank.Withdraw("2108996781057", "0612", 10) == Task.FromResult(true) &&
                 bank.Withdraw("2108996781057", "0612", 20) == Task.FromResult(true) &&
                 bank.Withdraw("2108996781057", "0612", 30) == Task.FromResult(true) &&

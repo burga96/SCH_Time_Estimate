@@ -1,10 +1,10 @@
 ﻿class State {
-    constructor(filter, columnName, isDescending, pageNumber, adminPass, queryParameters) {
+    constructor(filter, columnName, isDescending, pageNumber, password, uniqueMasterCitizenNumber, queryParameters) {
         this.Filter = filter;
         this.ColumnName = columnName;
         this.IsDescending = isDescending;
-        this.AdminPassword = adminPass;
-
+        this.Password = password;
+        this.UniqueMasterCitizenNumber = uniqueMasterCitizenNumber;
         this.PageNumber = (pageNumber === undefined || pageNumber === null)
             ? 1
             : pageNumber;
@@ -15,13 +15,19 @@
     }
 
     // Methods
-    ChangeAdminPass(adminPass) {
-        if (this.AdminPassword === adminPass) {
+    ChangePassword(password) {
+        if (this.Password === password) {
             return;
         }
-        this.AdminPassword = adminPass;
+        this.Password = password;
         this.PageNumber = 1;
         this.LoadResults();
+    }
+    ChangeUniqueMasterCitizenNumber(uniqueMasterCitizenNumber) {
+        if (this.UniqueMasterCitizenNumber === uniqueMasterCitizenNumber) {
+            return;
+        }
+        this.UniqueMasterCitizenNumber = uniqueMasterCitizenNumber;
     }
     ChangeFilter(filter) {
         if (this.Filter === filter) {
@@ -59,14 +65,16 @@
 
     LoadResults(additionalQueryParameters) {
         // additionalQueryParameters can be a string or an array
-        console.log(this.AdminPassword);
         let queryParameters = Array.from(this.QueryParameters);
         if (this.Filter !== null && this.Filter.length > 0) {
             const uriEncodedFilterString = encodeURIComponent(this.Filter);
             queryParameters.push(`filter=${uriEncodedFilterString}`);
         }
-        if (this.AdminPassword != null && this.AdminPassword.length > 0) {
-            queryParameters.push(`adminPassword=${this.AdminPassword}`);
+        if (this.Password != null && this.Password.length > 0) {
+            queryParameters.push(`password=${this.Password}`);
+        }
+        if (this.UniqueMasterCitizenNumber != null && this.UniqueMasterCitizenNumber.length > 0) {
+            queryParameters.push(`uniqueMasterCitizenNumber=${this.UniqueMasterCitizenNumber}`);
         }
         if (this.ColumnName !== null && this.ColumnName.length > 0) {
             const uriEncodedColumnNameString = encodeURIComponent(this.ColumnName);

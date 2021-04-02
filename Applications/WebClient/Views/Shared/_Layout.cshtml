@@ -75,6 +75,26 @@
                                 </ul>
                             </div>
                         </li>
+
+                        <li class="sidebar-dropdown">
+                            <a href="#">
+                                <span>Transactions</span>
+                            </a>
+                            <div class="sidebar-submenu">
+                                <ul>
+                                    <li>
+                                        <a asp-area="" asp-controller="PaymentTransactions" asp-action="MakeDeposit">
+                                            Make Deposit on wallet
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a asp-area="" asp-controller="PaymentTransactions" asp-action="MakeWithdrawal">
+                                            Make Withdraw from wallet
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>
                     </ul>
                 </div>
                 <!-- sidebar-menu  -->

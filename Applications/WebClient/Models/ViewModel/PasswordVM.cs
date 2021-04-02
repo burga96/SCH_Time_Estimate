@@ -5,20 +5,20 @@ using System.Threading.Tasks;
 
 namespace Applications.WebClient.Models.ViewModel
 {
-    public class AdminPasswordVM
+    public class PasswordVM
     {
         public string Password { get; set; }
         public string Error { get; set; }
-        public bool HasAdminPassword { get; set; }
+        public bool HasPassword { get; set; }
 
-        public AdminPasswordVM(string password, string error, bool hasAdminPassword)
+        public PasswordVM(string password, string error, bool hasPassword)
         {
             Password = password;
             Error = error;
-            HasAdminPassword = hasAdminPassword;
+            HasPassword = hasPassword;
         }
 
-        public AdminPasswordVM()
+        public PasswordVM()
         {
         }
     }

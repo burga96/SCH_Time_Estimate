@@ -80,6 +80,9 @@ namespace Core.Infrastructure.DataAccess.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("PostalIndexNumber")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("SupportedBankId")
                         .HasColumnType("int");
 

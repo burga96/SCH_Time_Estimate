@@ -59,9 +59,22 @@ namespace Core.ApplicationServices.ApplicationServices
                 throw new NotValidUniqueMasterCitizenNumberException("Unique master citizen number not valid for platform");
             }
             string walletPassword = PasswordGenerator.WalletPassword();
-            Wallet wallet = new Wallet(uniqueMasterCitizenNumberValue, supportedBank, firstName, lastName, walletPassword);
+            Wallet wallet = new Wallet(uniqueMasterCitizenNumberValue, supportedBank, firstName, lastName, walletPassword, postalIndexNumber);
             await _unitOfWork.WalletRepository.Insert(wallet);
             await _unitOfWork.SaveChangesAsync();
+            return new WalletDTO(wallet);
+        }
+
+        public async Task<WalletDTO> GetWalletByUniqueMasterCitizenNumberAndPassword(string uniqueMasterCitizenNumber, string password)
+        {
+            Wallet wallet = await _unitOfWork.WalletRepository.GetFirstOrDefault(Wallet =>
+               Wallet.UniqueMasterCitizenNumber.Value == uniqueMasterCitizenNumber &&
+               Wallet.Password == password
+            );
+            if (wallet == null)
+            {
+                throw new ArgumentException($"Wallet with {uniqueMasterCitizenNumber} and {password} does not exist");
+            }
             return new WalletDTO(wallet);
         }
 

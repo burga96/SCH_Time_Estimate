@@ -22,25 +22,12 @@ namespace Core.ApplicationServices.ApplicationServices
         }
 
         public async Task<DepositPaymentTransactionDTO> MakeDepositPaymentTransaction(string uniqueMasterCitizenNumberValue,
-            string postalIndexNumber,
             string password,
             decimal amount)
         {
-            Wallet wallet = await _unitOfWork.WalletRepository.GetFirstWithIncludes(Wallet =>
-                  Wallet.UniqueMasterCitizenNumber.Value == uniqueMasterCitizenNumberValue,
-                  Wallet => Wallet.SupportedBank,
-                  Wallet => Wallet.PaymentTransactions
-              );
-            if (wallet == null)
-            {
-                throw new ArgumentException($"Wallet with UMCN {uniqueMasterCitizenNumberValue} does not exist");
-            }
-            if (wallet.Password != password)
-            {
-                throw new WrongPasswordException("Wrong password");
-            }
+            Wallet wallet = await CheckForWallet(uniqueMasterCitizenNumberValue, password);
             IBankAPI bankAPI = _bankAPIDeterminator.DeterminateBankAPI(wallet.SupportedBank);
-            bool successWithdrawal = await bankAPI.Withdraw(uniqueMasterCitizenNumberValue, postalIndexNumber, amount);
+            bool successWithdrawal = await bankAPI.Withdraw(uniqueMasterCitizenNumberValue, wallet.PostalIndexNumber, amount);
             if (!successWithdrawal)
             {
                 throw new BankAPIException("Bank api - failed to withdrawal ");
@@ -52,25 +39,12 @@ namespace Core.ApplicationServices.ApplicationServices
         }
 
         public async Task<WithdrawalPaymentTransactionDTO> MakeWithdrawalPaymentTransaction(string uniqueMasterCitizenNumberValue,
-           string postalIndexNumber,
            string password,
            decimal amount)
         {
-            Wallet wallet = await _unitOfWork.WalletRepository.GetFirstWithIncludes(Wallet =>
-                  Wallet.UniqueMasterCitizenNumber.Value == uniqueMasterCitizenNumberValue,
-                  Wallet => Wallet.SupportedBank,
-                  Wallet => Wallet.PaymentTransactions
-              );
-            if (wallet == null)
-            {
-                throw new ArgumentException($"Wallet with UMCN {uniqueMasterCitizenNumberValue} does not exist");
-            }
-            if (wallet.Password != password)
-            {
-                throw new WrongPasswordException("Wrong password");
-            }
+            Wallet wallet = await CheckForWallet(uniqueMasterCitizenNumberValue, password);
             IBankAPI bankAPI = _bankAPIDeterminator.DeterminateBankAPI(wallet.SupportedBank);
-            bool successDeposit = await bankAPI.Deposit(uniqueMasterCitizenNumberValue, postalIndexNumber, amount);
+            bool successDeposit = await bankAPI.Deposit(uniqueMasterCitizenNumberValue, wallet.PostalIndexNumber, amount);
             if (!successDeposit)
             {
                 throw new BankAPIException("Bank api - failed to deposit");
@@ -79,6 +53,26 @@ namespace Core.ApplicationServices.ApplicationServices
             await _unitOfWork.PaymentTransactionRepository.Insert(withdrawalPaymentTransaction);
             await _unitOfWork.SaveChangesAsync();
             return new WithdrawalPaymentTransactionDTO(withdrawalPaymentTransaction);
+        }
+
+        private async Task<Wallet> CheckForWallet(string uniqueMasterCitizenNumberValue, string password)
+        {
+            Wallet wallet = await _unitOfWork.WalletRepository.GetFirstWithIncludes(Wallet =>
+                  Wallet.UniqueMasterCitizenNumber.Value == uniqueMasterCitizenNumberValue,
+                  Wallet => Wallet.SupportedBank,
+                  Wallet => Wallet.PaymentTransactions
+            );
+            if (wallet == null)
+            {
+                throw new ArgumentException($"Wallet with UMCN {uniqueMasterCitizenNumberValue} does not exist");
+            }
+            bool validPassword = wallet.VerifyPassword(password);
+            if (!validPassword)
+            {
+                throw new WrongPasswordException();
+            }
+
+            return wallet;
         }
     }
 }
