@@ -1,4 +1,5 @@
-﻿using Core.ApplicationServices.ApplicationExceptions;
+﻿using Core.ApplicationServices.ApplicationDTOs;
+using Core.ApplicationServices.ApplicationExceptions;
 using Core.ApplicationServices.ApplicationServiceInterfaces;
 using Core.Domain.Entities;
 using Core.Domain.ExternalInterfaces;
@@ -20,7 +21,7 @@ namespace Core.ApplicationServices.ApplicationServices
             _unitOfWork = unitOfWork;
         }
 
-        public async Task MakeDepositPaymentTransaction(string uniqueMasterCitizenNumberValue,
+        public async Task<DepositPaymentTransactionDTO> MakeDepositPaymentTransaction(string uniqueMasterCitizenNumberValue,
             string postalIndexNumber,
             string password,
             decimal amount)
@@ -47,9 +48,10 @@ namespace Core.ApplicationServices.ApplicationServices
             DepositPaymentTransaction depositPaymentTransaction = wallet.MakeDepositTransaction(amount);
             await _unitOfWork.PaymentTransactionRepository.Insert(depositPaymentTransaction);
             await _unitOfWork.SaveChangesAsync();
+            return new DepositPaymentTransactionDTO(depositPaymentTransaction);
         }
 
-        public async Task MakeWithdrawalPaymentTransaction(string uniqueMasterCitizenNumberValue,
+        public async Task<WithdrawalPaymentTransactionDTO> MakeWithdrawalPaymentTransaction(string uniqueMasterCitizenNumberValue,
            string postalIndexNumber,
            string password,
            decimal amount)
@@ -76,6 +78,7 @@ namespace Core.ApplicationServices.ApplicationServices
             WithdrawalPaymentTransaction withdrawalPaymentTransaction = wallet.MakeWithdrawalTransaction(amount);
             await _unitOfWork.PaymentTransactionRepository.Insert(withdrawalPaymentTransaction);
             await _unitOfWork.SaveChangesAsync();
+            return new WithdrawalPaymentTransactionDTO(withdrawalPaymentTransaction);
         }
     }
 }
