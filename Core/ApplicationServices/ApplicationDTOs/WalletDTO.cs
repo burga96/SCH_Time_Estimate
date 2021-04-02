@@ -20,6 +20,7 @@ namespace Core.ApplicationServices.ApplicationDTOs
             CurrentAmount = wallet.CurrentAmount;
             SupportedBankId = wallet.SupportedBankId;
             SupportedBankName = wallet.SupportedBank?.Name;
+            PaymentTransactions = wallet.PaymentTransactions != null ? wallet.PaymentTransactions.ToPaymentTransactionDTOs() : new List<PaymentTransactionDTO>();
         }
 
         public int Id { get; private set; }
@@ -33,6 +34,7 @@ namespace Core.ApplicationServices.ApplicationDTOs
         public string SupportedBankName { get; private set; }
         public string Password { get; private set; }
         public string PostalIndexNumber { get; set; }
+        public IEnumerable<PaymentTransactionDTO> PaymentTransactions { get; private set; }
     }
 
     public static partial class WalletExtensionMethods

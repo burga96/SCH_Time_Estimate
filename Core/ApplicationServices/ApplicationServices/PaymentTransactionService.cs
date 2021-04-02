@@ -30,7 +30,7 @@ namespace Core.ApplicationServices.ApplicationServices
             bool successWithdrawal = await bankAPI.Withdraw(uniqueMasterCitizenNumberValue, wallet.PostalIndexNumber, amount);
             if (!successWithdrawal)
             {
-                throw new BankAPIException("Bank api - failed to withdrawal ");
+                throw new BankAPIException("Bank api - failed to withdrawal");
             }
             DepositPaymentTransaction depositPaymentTransaction = wallet.MakeDepositTransaction(amount);
             await _unitOfWork.PaymentTransactionRepository.Insert(depositPaymentTransaction);

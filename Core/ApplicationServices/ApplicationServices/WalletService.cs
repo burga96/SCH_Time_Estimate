@@ -67,9 +67,10 @@ namespace Core.ApplicationServices.ApplicationServices
 
         public async Task<WalletDTO> GetWalletByUniqueMasterCitizenNumberAndPassword(string uniqueMasterCitizenNumber, string password)
         {
-            Wallet wallet = await _unitOfWork.WalletRepository.GetFirstOrDefault(Wallet =>
+            Wallet wallet = await _unitOfWork.WalletRepository.GetFirstWithIncludes(Wallet =>
                Wallet.UniqueMasterCitizenNumber.Value == uniqueMasterCitizenNumber &&
-               Wallet.Password == password
+               Wallet.Password == password,
+               Wallet => Wallet.PaymentTransactions
             );
             if (wallet == null)
             {
