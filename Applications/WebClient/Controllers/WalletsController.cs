@@ -125,5 +125,40 @@ namespace Applications.WebClient.Controllers
             IEnumerable<WalletVM> walletVMs = resultsAndTotalCountSupportedBanks.Results.ToWalletVMs();
             return View(walletVMs);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> ChangePassword(string password, string uniqueMasterCitizenNumber)
+        {
+            ChangePasswordVM changePasswordVM;
+            try
+            {
+                WalletDTO wallet = await _walletService.GetWalletByUniqueMasterCitizenNumberAndPassword(uniqueMasterCitizenNumber, password);
+
+                changePasswordVM = new ChangePasswordVM(uniqueMasterCitizenNumber, password, "", true, "");
+                return View(changePasswordVM);
+            }
+            catch (Exception)
+            {
+                changePasswordVM = new ChangePasswordVM(uniqueMasterCitizenNumber, password, "Enter valid unique master citizen number and password", false, "");
+                return View(changePasswordVM);
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ChangePassword(ChangePasswordVM changePassword)
+        {
+            try
+            {
+                await _walletService.ChangePassword(changePassword.UniqueMasterCitizenNumber, changePassword.Password, changePassword.NewPassword);
+                ViewData["Success"] = "Successfully changed password";
+                return View(changePassword);
+            }
+            catch (Exception e)
+            {
+                ViewData["Error"] = e.Message;
+                return View(changePassword);
+            }
+        }
     }
 }
