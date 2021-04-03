@@ -67,15 +67,7 @@ namespace Core.ApplicationServices.ApplicationServices
 
         public async Task<WalletDTO> GetWalletByUniqueMasterCitizenNumberAndPassword(string uniqueMasterCitizenNumber, string password)
         {
-            Wallet wallet = await _unitOfWork.WalletRepository.GetFirstWithIncludes(Wallet =>
-               Wallet.UniqueMasterCitizenNumber.Value == uniqueMasterCitizenNumber &&
-               Wallet.Password == password,
-               Wallet => Wallet.PaymentTransactions
-            );
-            if (wallet == null)
-            {
-                throw new ArgumentException($"Wallet with {uniqueMasterCitizenNumber} and {password} does not exist");
-            }
+            Wallet wallet = await CheckForWallet(uniqueMasterCitizenNumber, password);
             return new WalletDTO(wallet);
         }
 
@@ -109,6 +101,35 @@ namespace Core.ApplicationServices.ApplicationServices
                 );
             List<WalletDTO> wallets = resultsAndTotalCount.Results.ToWalletDTOs().ToList();
             return new ResultsAndTotalCount<WalletDTO>(wallets, resultsAndTotalCount.TotalCount);
+        }
+
+        public async Task<WalletDTO> ChangePassword(string uniqueMasterCitizenNumber, string oldPassword, string newPassword)
+        {
+            Wallet wallet = await CheckForWallet(uniqueMasterCitizenNumber, oldPassword);
+            wallet.ChangePassword(newPassword);
+            await _unitOfWork.WalletRepository.Update(wallet);
+            await _unitOfWork.SaveChangesAsync();
+            return new WalletDTO(wallet);
+        }
+
+        private async Task<Wallet> CheckForWallet(string uniqueMasterCitizenNumberValue, string password)
+        {
+            Wallet wallet = await _unitOfWork.WalletRepository.GetFirstWithIncludes(Wallet =>
+                  Wallet.UniqueMasterCitizenNumber.Value == uniqueMasterCitizenNumberValue,
+                  Wallet => Wallet.SupportedBank,
+                  Wallet => Wallet.PaymentTransactions
+            );
+            if (wallet == null)
+            {
+                throw new ArgumentException($"Wallet with UMCN {uniqueMasterCitizenNumberValue} does not exist");
+            }
+            bool validPassword = wallet.VerifyPassword(password);
+            if (!validPassword)
+            {
+                throw new WrongPasswordException();
+            }
+
+            return wallet;
         }
     }
 }

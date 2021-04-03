@@ -19,5 +19,7 @@ namespace Core.ApplicationServices.ApplicationServiceInterfaces
         Task<ResultsAndTotalCount<WalletDTO>> GetResultAndTotalCountWalletsAsync(string filter, OrderBySettings<Wallet> orderBySettings, int skip, int pageSize);
 
         Task<WalletDTO> GetWalletByUniqueMasterCitizenNumberAndPassword(string uniqueMasterCitizenNumber, string password);
+
+        Task<WalletDTO> ChangePassword(string uniqueMasterCitizenNumber, string password, string newPassword);
     }
 }

@@ -6,18 +6,17 @@ using System.Threading.Tasks;
 
 namespace Applications.WebClient.Models.ViewModel
 {
-    public class MakeWithdrawalPaymentTransactionVM : AuthenticationVM
+    public class ChangePasswordVM : AuthenticationVM
     {
-        public MakeWithdrawalPaymentTransactionVM()
+        public ChangePasswordVM()
         {
         }
 
-        public MakeWithdrawalPaymentTransactionVM(decimal currentAmount, string uniqueMasterCitizenNumber, string password, string error, bool authenticated) : base(uniqueMasterCitizenNumber, password, error, authenticated)
+        public ChangePasswordVM(string uniqueMasterCitizenNumber, string password, string error, bool authenticated, string newPassword) : base(uniqueMasterCitizenNumber, password, error, authenticated)
         {
-            CurrentAmount = currentAmount;
+            NewPassword = newPassword;
         }
 
-        public decimal CurrentAmount { get; set; }
-        public decimal Amount { get; set; }
+        public string NewPassword { get; set; }
     }
 }

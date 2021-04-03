@@ -3,6 +3,7 @@ using Core.Domain.Exceptions;
 using Core.Domain.ValueObjects;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Core.Domain.Entities
@@ -61,6 +62,16 @@ namespace Core.Domain.Entities
             var withdrawalPaymentTransaction = new WithdrawalPaymentTransaction(this, withdrawalAmount);
             PaymentTransactions.Add(withdrawalPaymentTransaction);
             return withdrawalPaymentTransaction;
+        }
+
+        public void ChangePassword(string newPassword)
+        {
+            bool onlyDigits = newPassword.All(c => char.IsDigit(c));
+            if (newPassword.Length != 6 || !onlyDigits)
+            {
+                throw new InvalidNewPasswordException();
+            }
+            Password = newPassword;
         }
     }
 }
