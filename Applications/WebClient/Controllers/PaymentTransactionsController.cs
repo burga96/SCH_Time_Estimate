@@ -51,7 +51,8 @@ namespace Applications.WebClient.Controllers
             try
             {
                 await _paymentTransactionService.MakeDepositPaymentTransaction(makeDepositPaymentTransaction.UniqueMasterCitizenNumber, makeDepositPaymentTransaction.Password, makeDepositPaymentTransaction.Amount);
-                return View();
+                return RedirectToAction(nameof(MyPaymentTransactions),
+                    new { password = makeDepositPaymentTransaction.Password, uniqueMasterCitizenNumber = makeDepositPaymentTransaction.UniqueMasterCitizenNumber });
             }
             catch (Exception e)
             {
@@ -86,7 +87,8 @@ namespace Applications.WebClient.Controllers
             {
                 await _paymentTransactionService.MakeWithdrawalPaymentTransaction(withdrawalPaymentTransaction.UniqueMasterCitizenNumber, withdrawalPaymentTransaction.Password, withdrawalPaymentTransaction.Amount);
 
-                return View();
+                return RedirectToAction(nameof(MyPaymentTransactions),
+                    new { password = withdrawalPaymentTransaction.Password, uniqueMasterCitizenNumber = withdrawalPaymentTransaction.UniqueMasterCitizenNumber });
             }
             catch (Exception e)
             {
