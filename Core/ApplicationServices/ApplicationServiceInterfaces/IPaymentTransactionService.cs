@@ -10,12 +10,17 @@ namespace Core.ApplicationServices.ApplicationServiceInterfaces
 {
     public interface IPaymentTransactionService
     {
-        Task<DepositPaymentTransactionDTO> MakeDepositPaymentTransaction(string uniqueMasterCitizenNumberValue,
+        Task<DepositPaymentTransactionDTO> MakeDepositPaymentTransaction(string uniqueMasterCitizenNumber,
             string password,
             decimal amount);
 
-        Task<WithdrawalPaymentTransactionDTO> MakeWithdrawalPaymentTransaction(string uniqueMasterCitizenNumberValue,
+        Task<WithdrawalPaymentTransactionDTO> MakeWithdrawalPaymentTransaction(string uniqueMasterCitizenNumber,
             string password,
             decimal amount);
+
+        Task<WalletDTO> GetWalletWithFiltertedPaymentTransactionsForUser(string uniqueMasterCitizenNumberValue,
+            string password,
+            DateTime? from,
+            DateTime? to);
     }
 }

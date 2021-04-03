@@ -94,5 +94,74 @@ namespace Applications.WebClient.Controllers
                 return View(withdrawalPaymentTransaction);
             }
         }
+
+        [HttpGet]
+        public async Task<IActionResult> MyPaymentTransactions(string password,
+            string uniqueMasterCitizenNumber)
+        {
+            MyPaymentTransactionsVM myPaymentTransactionsVM;
+            try
+            {
+                WalletDTO wallet = await _paymentTransactionService.GetWalletWithFiltertedPaymentTransactionsForUser(uniqueMasterCitizenNumber, password, null, null);
+
+                myPaymentTransactionsVM = new MyPaymentTransactionsVM(wallet.CurrentAmount,
+                    uniqueMasterCitizenNumber,
+                    password,
+                    "",
+                    true,
+                    wallet.PaymentTransactions.ToPaymentTransactionVMs(),
+                    null,
+                    null)
+                    ;
+                return View(myPaymentTransactionsVM);
+            }
+            catch (Exception)
+            {
+                myPaymentTransactionsVM = new MyPaymentTransactionsVM(0,
+                    uniqueMasterCitizenNumber,
+                    password,
+                    "Enter valid unique master citizen number and password",
+                    false,
+                    new List<PaymentTransactionVM>(),
+                    null,
+                    null);
+                return View(myPaymentTransactionsVM);
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> MyPaymentTransactions(MyPaymentTransactionsVM myPaymentTransaction)
+        {
+            try
+            {
+                WalletDTO wallet = await _paymentTransactionService
+                    .GetWalletWithFiltertedPaymentTransactionsForUser(myPaymentTransaction.UniqueMasterCitizenNumber,
+                    myPaymentTransaction.Password,
+                    myPaymentTransaction.From,
+                    myPaymentTransaction.To);
+
+                var viewModel = new MyPaymentTransactionsVM(wallet.CurrentAmount,
+                   myPaymentTransaction.UniqueMasterCitizenNumber,
+                   myPaymentTransaction.Password,
+                   "",
+                   true,
+                   wallet.PaymentTransactions.ToPaymentTransactionVMs(),
+                   myPaymentTransaction.From,
+                    myPaymentTransaction.To);
+                return View(viewModel);
+            }
+            catch (Exception)
+            {
+                var viewModel = new MyPaymentTransactionsVM(0,
+                    myPaymentTransaction.UniqueMasterCitizenNumber,
+                    myPaymentTransaction.Password,
+                    "Enter valid unique master citizen number and password",
+                    false,
+                    new List<PaymentTransactionVM>(),
+                    null,
+                    null);
+                return View(viewModel);
+            }
+        }
     }
 }

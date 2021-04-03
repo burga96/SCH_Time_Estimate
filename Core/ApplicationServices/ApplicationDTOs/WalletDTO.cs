@@ -23,6 +23,21 @@ namespace Core.ApplicationServices.ApplicationDTOs
             PaymentTransactions = wallet.PaymentTransactions != null ? wallet.PaymentTransactions.ToPaymentTransactionDTOs() : new List<PaymentTransactionDTO>();
         }
 
+        public WalletDTO(Wallet wallet, IEnumerable<PaymentTransaction> paymentTransactions)
+        {
+            Id = wallet.Id;
+            UniqueMasterCitizenNumber = wallet.UniqueMasterCitizenNumber.Value;
+            Password = wallet.Password;
+            FirstName = wallet.PersonalData.FirstName;
+            LastName = wallet.PersonalData.LastName;
+            FullName = wallet.PersonalData.FullName;
+            PostalIndexNumber = wallet.PostalIndexNumber;
+            CurrentAmount = wallet.CurrentAmount;
+            SupportedBankId = wallet.SupportedBankId;
+            SupportedBankName = wallet.SupportedBank?.Name;
+            PaymentTransactions = paymentTransactions.ToPaymentTransactionDTOs();
+        }
+
         public int Id { get; private set; }
         public string UniqueMasterCitizenNumber { get; private set; }
         public decimal CurrentAmount { get; private set; }
