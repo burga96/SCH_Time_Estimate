@@ -16,38 +16,8 @@ using System.Threading.Tasks;
 
 namespace Core.ApplicationServices.IntegrationTests.WalletsService
 {
-    [TestClass]
     public partial class WalletServiceTests
     {
-        private IUnitOfWork _unitOfWork;
-        private TimeEstimateDBContext _context;
-        private IWalletService _walletService;
-
-        [TestInitialize]
-        public void Setup()
-        {
-            var dbContextFactory = new SampleDbContextFactory();
-            var bankAPIDeterminator = new BankAPIDeterminator();
-            _context = dbContextFactory.CreateDbContext(new string[] { });
-            _unitOfWork = new EfCoreUnitOfWork(_context);
-            _walletService = new WalletService(_unitOfWork, bankAPIDeterminator);
-        }
-
-        [TestCleanup()]
-        public async Task Cleanup()
-        {
-            await RemoveAllWallets();
-            await _context.DisposeAsync();
-            _unitOfWork = null;
-            _walletService = null;
-        }
-
-        private async Task RemoveAllWallets()
-        {
-            _context.Wallets.RemoveRange(_context.Wallets.ToList());
-            await _context.SaveChangesAsync();
-        }
-
         [DataRow("2108996781057", "0612", "Stefan", "Burgic", 1)]
         [DataRow("2008996781057", "0613", "Vukoman", "Stojanovic", 1)]
         [DataRow("1908996781057", "1213", "Branko", "Djakovic", 1)]
