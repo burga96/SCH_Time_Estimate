@@ -1,0 +1,110 @@
+﻿@model Applications.WebClient.Models.ViewModel.MyPaymentTransactionsVM
+
+@{
+    ViewData["Title"] = "My payment transactions";
+}
+
+<h4>My payment transactions</h4>
+
+@if (!Model.Authenticated)
+{
+    @await Html.PartialAsync("_Authentication", new Applications.WebClient.Models.ViewModel.AuthenticationVM(Model.UniqueMasterCitizenNumber, Model.Password, Model.Error, Model.Authenticated));
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4" style="float:left">
+            <form asp-action="MyPaymentTransactions" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="form-group" hidden="hidden">
+                    <input asp-for="Password" class="form-control" />
+                </div>
+                <div class="form-group" hidden="hidden">
+                    <input asp-for="UniqueMasterCitizenNumber" class="form-control" />
+                </div>
+                <div class="form-group" hidden="hidden">
+                    <input asp-for="Authenticated" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label asp-for="CurrentAmount" class="control-label"></label>
+                    <input asp-for="CurrentAmount" readonly class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label asp-for="From" class="control-label"></label>
+                    <input type="date" asp-for="From" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label asp-for="To" class="control-label"></label>
+                    <input type="date" asp-for="To" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <input type="submit" value="Filter" class="btn btn-primary" />
+                </div>
+                <div class="text-danger">
+                    @ViewData["Error"]
+                </div>
+            </form>
+        </div>
+        <div class="col-md-4" style="float: left">
+            <a asp-action="Index">Back</a>
+        </div>
+    </div>
+
+    <table class="table mt-3">
+        <thead>
+            <tr>
+                <th>
+                    <div>
+                        Amount
+                    </div>
+                </th>
+                <th>
+                    <div>
+                        Type
+                    </div>
+                </th>
+                <th>
+                    <div>
+                        Date
+                    </div>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.PaymentTransactions)
+            {
+                <tr>
+                    <td>
+                        @if (item.Type == Core.Domain.Entities.Enums.PaymentTransactionType.DEPOSIT)
+                        {
+                            <div class="text-success">
+                                +@Html.DisplayFor(modelItem => item.Amount)
+                            </div>
+                        }
+                        @if (item.Type == Core.Domain.Entities.Enums.PaymentTransactionType.WITHDRAWAL)
+                        {
+                            <div class="text-danger">
+                                -@Html.DisplayFor(modelItem => item.Amount)
+                            </div>
+                        }
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Type)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.DateCreated)
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/js/dataView/State.js"></script>
+    <script src="~/js/dataView/dateView.js"></script>
+    <script>
+        InitializeDataView("", "", "", 0, "@Model.Password", "@Model.UniqueMasterCitizenNumber");
+    </script>
+}

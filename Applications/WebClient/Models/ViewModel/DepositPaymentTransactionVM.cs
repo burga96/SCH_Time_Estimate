@@ -13,7 +13,7 @@ namespace Applications.WebClient.Models.ViewModel
         {
         }
 
-        public DepositPaymentTransactionVM(WithdrawalPaymentTransactionDTO paymentTransaction) : base(paymentTransaction)
+        public DepositPaymentTransactionVM(DepositPaymentTransactionDTO paymentTransaction) : base(paymentTransaction)
         {
         }
     }

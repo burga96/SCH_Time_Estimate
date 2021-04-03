@@ -3,6 +3,7 @@ using Core.Domain.Entities;
 using Core.Domain.Entities.Enums;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Applications.WebClient.Models.ViewModel
@@ -29,5 +30,27 @@ namespace Applications.WebClient.Models.ViewModel
         public decimal Amount { get; set; }
         public DateTime DateCreated { get; set; }
         public PaymentTransactionType Type { get; set; }
+    }
+
+    public static class PaymentTransactionExtensionMethods
+    {
+        public static PaymentTransactionVM ToPaymentTransactionVM(this PaymentTransactionDTO paymentTransaction)
+        {
+            switch (paymentTransaction.Type)
+            {
+                case PaymentTransactionType.DEPOSIT:
+                    return new DepositPaymentTransactionVM((DepositPaymentTransactionDTO)paymentTransaction);
+
+                case PaymentTransactionType.WITHDRAWAL:
+                    return new WithdrawalPaymentTransactionVM((WithdrawalPaymentTransactionDTO)paymentTransaction);
+            }
+
+            return null;
+        }
+
+        public static IEnumerable<PaymentTransactionVM> ToPaymentTransactionVMs(this IEnumerable<PaymentTransactionDTO> paymentTransactions)
+        {
+            return paymentTransactions.Select(PaymentTransaction => ToPaymentTransactionVM(PaymentTransaction));
+        }
     }
 }

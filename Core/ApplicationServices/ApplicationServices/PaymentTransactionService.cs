@@ -5,6 +5,7 @@ using Core.Domain.Entities;
 using Core.Domain.ExternalInterfaces;
 using Core.Domain.RepositoryInterfaces;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Core.ApplicationServices.ApplicationServices
@@ -53,6 +54,25 @@ namespace Core.ApplicationServices.ApplicationServices
             await _unitOfWork.PaymentTransactionRepository.Insert(withdrawalPaymentTransaction);
             await _unitOfWork.SaveChangesAsync();
             return new WithdrawalPaymentTransactionDTO(withdrawalPaymentTransaction);
+        }
+
+        public async Task<WalletDTO> GetWalletWithFiltertedPaymentTransactionsForUser(string uniqueMasterCitizenNumberValue,
+            string password,
+            DateTime? from,
+            DateTime? to)
+        {
+            Wallet wallet = await CheckForWallet(uniqueMasterCitizenNumberValue, password);
+            List<PaymentTransaction> filteredTransactions = new List<PaymentTransaction>();
+            foreach (PaymentTransaction paymentTransaction in wallet.PaymentTransactions)
+            {
+                if (((from != null && paymentTransaction.DateCreated >= from) || (from == null)) &&
+                    ((to != null && paymentTransaction.DateCreated <= to) || (to == null)))
+                {
+                    filteredTransactions.Add(paymentTransaction);
+                }
+            }
+            WalletDTO walletDTO = new WalletDTO(wallet, filteredTransactions);
+            return walletDTO;
         }
 
         private async Task<Wallet> CheckForWallet(string uniqueMasterCitizenNumberValue, string password)
