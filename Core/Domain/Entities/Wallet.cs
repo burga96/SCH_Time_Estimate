@@ -62,5 +62,10 @@ namespace Core.Domain.Entities
             PaymentTransactions.Add(withdrawalPaymentTransaction);
             return withdrawalPaymentTransaction;
         }
+
+        public void ChangePassword(string newPassword)
+        {
+            Password = newPassword;
+        }
     }
 }
