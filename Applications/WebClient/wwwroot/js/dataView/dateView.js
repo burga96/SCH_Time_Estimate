@@ -70,10 +70,14 @@
         state.ChangeFilter(filterInput.value);
     }
     function onPassButtonClick() {
-        const pass = document.getElementById("pass-text").value;
-        const unique = document.getElementById("unique-text").value;
-        state.ChangeUniqueMasterCitizenNumber(unique);
-        state.ChangePassword(pass);
+        let pass = document.getElementById("pass-text");
+        let unique = document.getElementById("unique-text");
+        if (unique) {
+            state.ChangeUniqueMasterCitizenNumber(unique.value);
+        }
+        if (pass) {
+            state.ChangePassword(pass.value);
+        }
     }
 
     function onFilterInputKeypress($event) {

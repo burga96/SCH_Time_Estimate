@@ -18,10 +18,13 @@ namespace Applications.WebClient.Controllers
     {
         private readonly IPaymentTransactionService _paymentTransactionService;
         private readonly IWalletService _walletService;
+        private readonly string _adminPassword;
 
         public PaymentTransactionsController(IPaymentTransactionService paymentTransactionService,
-            IWalletService walletService)
+            IWalletService walletService,
+            IConfiguration configuration)
         {
+            _adminPassword = configuration["Wallet:AdminPassword"];
             _walletService = walletService;
             _paymentTransactionService = paymentTransactionService;
         }
@@ -164,6 +167,44 @@ namespace Applications.WebClient.Controllers
                     null);
                 return View(viewModel);
             }
+        }
+
+        public async Task<IActionResult> GetPaymentTransactionsByAdmin(string password,
+            DateTime? from,
+            DateTime? to)
+        {
+            PaymentTransactionsByAdminVM paymentTransactionsByAdmin;
+            if (password != _adminPassword)
+            {
+                paymentTransactionsByAdmin = new PaymentTransactionsByAdminVM(password, "Enter valid admin password", false, new List<PaymentTransactionVM>(), from, to);
+                return View(paymentTransactionsByAdmin);
+            }
+
+            IEnumerable<PaymentTransactionDTO> paymentTransactionDTOs = await _paymentTransactionService
+                .GetAllPaymentTransactions(from, to);
+
+            IEnumerable<PaymentTransactionVM> paymentTransactionVMs = paymentTransactionDTOs.ToPaymentTransactionVMs();
+            paymentTransactionsByAdmin = new PaymentTransactionsByAdminVM(password, "", true, paymentTransactionVMs, from, to);
+            return View(paymentTransactionsByAdmin);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> GetPaymentTransactionsByAdmin(PaymentTransactionsByAdminVM paymentTransactionsByAdmin)
+        {
+            if (paymentTransactionsByAdmin.Password != _adminPassword)
+            {
+                paymentTransactionsByAdmin.PaymentTransactions = new List<PaymentTransactionVM>();
+                paymentTransactionsByAdmin.Error = string.IsNullOrEmpty(paymentTransactionsByAdmin.Password) ? "" : "Enter valid admin password";
+                paymentTransactionsByAdmin.HasPassword = false;
+                return View(paymentTransactionsByAdmin);
+            }
+            IEnumerable<PaymentTransactionDTO> paymentTransactionDTOs = await _paymentTransactionService
+                .GetAllPaymentTransactions(paymentTransactionsByAdmin.From, paymentTransactionsByAdmin.To);
+
+            IEnumerable<PaymentTransactionVM> paymentTransactionVMs = paymentTransactionDTOs.ToPaymentTransactionVMs();
+            paymentTransactionsByAdmin.PaymentTransactions = paymentTransactionVMs;
+            paymentTransactionsByAdmin.HasPassword = true;
+            return View(paymentTransactionsByAdmin);
         }
     }
 }

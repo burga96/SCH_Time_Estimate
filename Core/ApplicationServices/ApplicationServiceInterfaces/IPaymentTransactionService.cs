@@ -22,5 +22,8 @@ namespace Core.ApplicationServices.ApplicationServiceInterfaces
             string password,
             DateTime? from,
             DateTime? to);
+
+        Task<IEnumerable<PaymentTransactionDTO>> GetAllPaymentTransactions(DateTime? from,
+            DateTime? to);
     }
 }

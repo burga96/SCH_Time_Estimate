@@ -14,6 +14,7 @@ namespace Core.ApplicationServices.ApplicationServices
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IBankAPIDeterminator _bankAPIDeterminator;
+        private readonly string _adminPassword;
 
         public PaymentTransactionService(IUnitOfWork unitOfWork,
             IBankAPIDeterminator bankAPIDeterminator)
@@ -73,6 +74,16 @@ namespace Core.ApplicationServices.ApplicationServices
             }
             WalletDTO walletDTO = new WalletDTO(wallet, filteredTransactions);
             return walletDTO;
+        }
+
+        public async Task<IEnumerable<PaymentTransactionDTO>> GetAllPaymentTransactions(DateTime? from, DateTime? to)
+        {
+            IEnumerable<PaymentTransaction> paymentTransactions = await _unitOfWork.PaymentTransactionRepository
+                .GetFilteredList(
+                 paymentTransaction => (((from != null && paymentTransaction.DateCreated >= from) || (from == null)) &&
+                    ((to != null && paymentTransaction.DateCreated <= to) || (to == null)))
+                );
+            return paymentTransactions.ToPaymentTransactionDTOs();
         }
 
         private async Task<Wallet> CheckForWallet(string uniqueMasterCitizenNumberValue, string password)
