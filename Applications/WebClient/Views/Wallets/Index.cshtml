@@ -83,6 +83,14 @@ else
                         @Html.DisplayFor(modelItem => item.CurrentAmount)
                     </td>
                     <td>
+                        @if (item.Status == Core.Domain.Entities.Enums.WalletStatus.ACTIVE)
+                        {
+                            <a href="/Wallets/Block?password=@((string)ViewBag.AdminPassword)&id=@(item.Id)">Block</a>
+                        }
+                        else
+                        {
+                            <a href="/Wallets/Activate?password=@((string)ViewBag.AdminPassword)&id=@(item.Id)">Activate</a>
+                        }
                     </td>
                 </tr>
             }

@@ -26,6 +26,7 @@ namespace Core.Domain.Entities
             SupportedBank = supportedBank;
             Password = password;
             PostalIndexNumber = postalIndexNumber;
+            Status = WalletStatus.ACTIVE;
             PaymentTransactions = new List<PaymentTransaction>();
         }
 
@@ -38,6 +39,7 @@ namespace Core.Domain.Entities
         public SupportedBank SupportedBank { get; private set; }
         public string Password { get; private set; }
         public ICollection<PaymentTransaction> PaymentTransactions { get; private set; }
+        public WalletStatus Status { get; private set; }
 
         public bool VerifyPassword(string password)
         {

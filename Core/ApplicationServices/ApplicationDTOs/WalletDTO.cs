@@ -1,4 +1,5 @@
 ﻿using Core.Domain.Entities;
+using Core.Domain.Entities.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,6 +34,7 @@ namespace Core.ApplicationServices.ApplicationDTOs
             FullName = wallet.PersonalData.FullName;
             PostalIndexNumber = wallet.PostalIndexNumber;
             CurrentAmount = wallet.CurrentAmount;
+            Status = wallet.Status;
             SupportedBankId = wallet.SupportedBankId;
             SupportedBankName = wallet.SupportedBank?.Name;
             PaymentTransactions = paymentTransactions.ToPaymentTransactionDTOs();
@@ -50,6 +52,7 @@ namespace Core.ApplicationServices.ApplicationDTOs
         public string Password { get; private set; }
         public string PostalIndexNumber { get; set; }
         public IEnumerable<PaymentTransactionDTO> PaymentTransactions { get; private set; }
+        public WalletStatus Status { get; private set; }
     }
 
     public static partial class WalletExtensionMethods
