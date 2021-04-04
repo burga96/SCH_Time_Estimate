@@ -144,6 +144,24 @@ namespace Applications.WebClient.Controllers
             }
         }
 
+        [HttpGet]
+        public async Task<IActionResult> Info(string password, string uniqueMasterCitizenNumber)
+        {
+            WalletInfoVM walletInfo;
+            try
+            {
+                WalletDTO walletDTO = await _walletService.GetWalletByUniqueMasterCitizenNumberAndPassword(uniqueMasterCitizenNumber, password);
+                var walletVM = new WalletVM(walletDTO);
+                walletInfo = new WalletInfoVM(uniqueMasterCitizenNumber, password, "", true, walletVM);
+                return View(walletInfo);
+            }
+            catch (Exception)
+            {
+                walletInfo = new WalletInfoVM(uniqueMasterCitizenNumber, password, "Enter valid unique master citizen number and password", false, new WalletVM());
+                return View(walletInfo);
+            }
+        }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ChangePassword(ChangePasswordVM changePassword)
