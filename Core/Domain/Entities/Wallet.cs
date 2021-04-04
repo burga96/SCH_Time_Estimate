@@ -41,6 +41,14 @@ namespace Core.Domain.Entities
         public ICollection<PaymentTransaction> PaymentTransactions { get; private set; }
         public WalletStatus Status { get; private set; }
 
+        public void CheckIfWalletIsBlocked()
+        {
+            if (Status == WalletStatus.BLOCKED)
+            {
+                throw new WalletStatusException("Wallet is blocked");
+            }
+        }
+
         public bool VerifyPassword(string password)
         {
             return Password.Equals(password);
@@ -48,6 +56,7 @@ namespace Core.Domain.Entities
 
         public DepositPaymentTransaction MakeDepositTransaction(decimal depositAmount)
         {
+            CheckIfWalletIsBlocked();
             var depositPaymentTransaction = new DepositPaymentTransaction(this, depositAmount);
             PaymentTransactions.Add(depositPaymentTransaction);
             CurrentAmount += depositAmount;
@@ -56,6 +65,7 @@ namespace Core.Domain.Entities
 
         public WithdrawalPaymentTransaction MakeWithdrawalTransaction(decimal withdrawalAmount)
         {
+            CheckIfWalletIsBlocked();
             if (CurrentAmount < withdrawalAmount)
             {
                 throw new NotEnoughAmountException();
@@ -68,6 +78,7 @@ namespace Core.Domain.Entities
 
         public void ChangePassword(string newPassword)
         {
+            CheckIfWalletIsBlocked();
             bool onlyDigits = newPassword.All(c => char.IsDigit(c));
             if (newPassword.Length != 6 || !onlyDigits)
             {

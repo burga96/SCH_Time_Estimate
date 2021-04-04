@@ -2,6 +2,7 @@
 using Core.ApplicationServices.ApplicationExceptions;
 using Core.ApplicationServices.IntegrationTests.Common;
 using Core.Domain.Entities.Enums;
+using Core.Domain.Exceptions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Linq;
@@ -42,13 +43,30 @@ namespace Core.ApplicationServices.IntegrationTests.PaymentTransactionService
             decimal depositAmount2 = (decimal)d2;
             WalletDTO wallet = await ArrangeWallet();
             //Act
-            await _paymentTransactionService.MakeDepositPaymentTransaction(uniqueMasterCitizenNumber, wallet.Password, depositAmount1);
-            await _paymentTransactionService.MakeDepositPaymentTransaction(uniqueMasterCitizenNumber, wallet.Password, depositAmount2);
+            await _paymentTransactionService.MakeDepositPaymentTransaction(wallet.UniqueMasterCitizenNumber, wallet.Password, depositAmount1);
+            await _paymentTransactionService.MakeDepositPaymentTransaction(wallet.UniqueMasterCitizenNumber, wallet.Password, depositAmount2);
 
             //Assert
             WalletDTO wallet2 = await _walletService.GetWalletByUniqueMasterCitizenNumberAndPassword(uniqueMasterCitizenNumber, wallet.Password);
             Assert.AreEqual(wallet2.CurrentAmount, depositAmount1 + depositAmount2);
             Assert.AreEqual(wallet2.PaymentTransactions.Count(), 2);
+        }
+
+        [DataRow(10.0)]
+        [DataRow(20.0)]
+        [DataRow(30.0)]
+        [DataRow(40.0)]
+        [DataTestMethod]
+        public async Task MakeDepositPaymentTransactionsWhenWalletIsBlocked(double d)
+        {
+            //Aramge
+            decimal amount = (decimal)d;
+            WalletDTO wallet = await ArrangeWallet();
+            await _walletService.BlockWallet(wallet.Id);
+            //Act & Assert
+            ExceptionAssert.Throws<WalletStatusException>(() =>
+              _paymentTransactionService.MakeDepositPaymentTransaction(wallet.UniqueMasterCitizenNumber, wallet.Password, amount).Wait()
+           );
         }
 
         //ArgumentException
