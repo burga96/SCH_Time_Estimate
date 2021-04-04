@@ -20,6 +20,7 @@ namespace Core.ApplicationServices.ApplicationDTOs
             PostalIndexNumber = wallet.PostalIndexNumber;
             CurrentAmount = wallet.CurrentAmount;
             SupportedBankId = wallet.SupportedBankId;
+            Status = wallet.Status;
             SupportedBankName = wallet.SupportedBank?.Name;
             PaymentTransactions = wallet.PaymentTransactions != null ? wallet.PaymentTransactions.ToPaymentTransactionDTOs() : new List<PaymentTransactionDTO>();
         }

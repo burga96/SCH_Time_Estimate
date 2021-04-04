@@ -75,5 +75,23 @@ namespace Core.Domain.Entities
             }
             Password = newPassword;
         }
+
+        public void Activate()
+        {
+            if (Status != WalletStatus.BLOCKED)
+            {
+                throw new WalletStatusException("Cannot activate wallet because it is not blocked");
+            }
+            Status = WalletStatus.ACTIVE;
+        }
+
+        public void Block()
+        {
+            if (Status != WalletStatus.ACTIVE)
+            {
+                throw new WalletStatusException("Cannot block wallet because it is not active");
+            }
+            Status = WalletStatus.BLOCKED;
+        }
     }
 }

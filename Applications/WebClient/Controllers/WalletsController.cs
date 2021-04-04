@@ -127,6 +127,28 @@ namespace Applications.WebClient.Controllers
         }
 
         [HttpGet]
+        public async Task<IActionResult> Activate(string password, int id)
+        {
+            if (password != _adminPassword)
+            {
+                return RedirectToAction(nameof(Index));
+            }
+            await _walletService.ActivateWallet(id);
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Block(string password, int id)
+        {
+            if (password != _adminPassword)
+            {
+                return RedirectToAction(nameof(Index));
+            }
+            await _walletService.BlockWallet(id);
+            return RedirectToAction(nameof(Index), new { password = password });
+        }
+
+        [HttpGet]
         public async Task<IActionResult> ChangePassword(string password, string uniqueMasterCitizenNumber)
         {
             ChangePasswordVM changePasswordVM;
