@@ -26,6 +26,7 @@ namespace Core.Domain.Entities
             SupportedBank = supportedBank;
             Password = password;
             PostalIndexNumber = postalIndexNumber;
+            Status = WalletStatus.ACTIVE;
             PaymentTransactions = new List<PaymentTransaction>();
         }
 
@@ -38,6 +39,15 @@ namespace Core.Domain.Entities
         public SupportedBank SupportedBank { get; private set; }
         public string Password { get; private set; }
         public ICollection<PaymentTransaction> PaymentTransactions { get; private set; }
+        public WalletStatus Status { get; private set; }
+
+        public void CheckIfWalletIsBlocked()
+        {
+            if (Status == WalletStatus.BLOCKED)
+            {
+                throw new WalletStatusException("Wallet is blocked");
+            }
+        }
 
         public bool VerifyPassword(string password)
         {
@@ -46,6 +56,7 @@ namespace Core.Domain.Entities
 
         public DepositPaymentTransaction MakeDepositTransaction(decimal depositAmount)
         {
+            CheckIfWalletIsBlocked();
             var depositPaymentTransaction = new DepositPaymentTransaction(this, depositAmount);
             PaymentTransactions.Add(depositPaymentTransaction);
             CurrentAmount += depositAmount;
@@ -54,6 +65,7 @@ namespace Core.Domain.Entities
 
         public WithdrawalPaymentTransaction MakeWithdrawalTransaction(decimal withdrawalAmount)
         {
+            CheckIfWalletIsBlocked();
             if (CurrentAmount < withdrawalAmount)
             {
                 throw new NotEnoughAmountException();
@@ -66,12 +78,31 @@ namespace Core.Domain.Entities
 
         public void ChangePassword(string newPassword)
         {
+            CheckIfWalletIsBlocked();
             bool onlyDigits = newPassword.All(c => char.IsDigit(c));
             if (newPassword.Length != 6 || !onlyDigits)
             {
                 throw new InvalidNewPasswordException();
             }
             Password = newPassword;
+        }
+
+        public void Activate()
+        {
+            if (Status != WalletStatus.BLOCKED)
+            {
+                throw new WalletStatusException("Cannot activate wallet because it is not blocked");
+            }
+            Status = WalletStatus.ACTIVE;
+        }
+
+        public void Block()
+        {
+            if (Status != WalletStatus.ACTIVE)
+            {
+                throw new WalletStatusException("Cannot block wallet because it is not active");
+            }
+            Status = WalletStatus.BLOCKED;
         }
     }
 }

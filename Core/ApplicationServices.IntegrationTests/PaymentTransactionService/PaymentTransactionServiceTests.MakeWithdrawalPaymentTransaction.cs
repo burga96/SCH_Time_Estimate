@@ -73,10 +73,29 @@ namespace Core.ApplicationServices.IntegrationTests.PaymentTransactionService
             //Arange
             WalletDTO wallet = await ArrangeWallet();
             decimal amount = (decimal)w;
+
             //Act & Assert
             ExceptionAssert.Throws<WrongPasswordException>(() =>
                _paymentTransactionService.MakeWithdrawalPaymentTransaction(wallet.UniqueMasterCitizenNumber, password, amount).Wait()
             );
+        }
+
+        [DataRow(10.0)]
+        [DataRow(20.0)]
+        [DataRow(30.0)]
+        [DataRow(40.0)]
+        [DataTestMethod]
+        public async Task MakeWithdrawalPaymentTransactionsWhenWalletIsBlocked(double d)
+        {
+            //Aramge
+            decimal amount = (decimal)d;
+            WalletDTO wallet = await ArrangeWallet();
+            await _paymentTransactionService.MakeDepositPaymentTransaction(wallet.UniqueMasterCitizenNumber, wallet.Password, amount);
+            await _walletService.BlockWallet(wallet.Id);
+            //Act & Assert
+            ExceptionAssert.Throws<WalletStatusException>(() =>
+              _paymentTransactionService.MakeWithdrawalPaymentTransaction(wallet.UniqueMasterCitizenNumber, wallet.Password, amount).Wait()
+           );
         }
 
         [DataRow(15.0)]

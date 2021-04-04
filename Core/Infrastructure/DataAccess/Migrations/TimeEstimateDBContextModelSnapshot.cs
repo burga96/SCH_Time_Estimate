@@ -83,6 +83,9 @@ namespace Core.Infrastructure.DataAccess.Migrations
                     b.Property<string>("PostalIndexNumber")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
                     b.Property<int>("SupportedBankId")
                         .HasColumnType("int");
 

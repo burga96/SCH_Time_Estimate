@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Core.Infrastructure.DataAccess.Migrations
 {
     [DbContext(typeof(TimeEstimateDBContext))]
-    [Migration("20210402092137_Initial")]
+    [Migration("20210404165754_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -84,6 +84,9 @@ namespace Core.Infrastructure.DataAccess.Migrations
 
                     b.Property<string>("PostalIndexNumber")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
 
                     b.Property<int>("SupportedBankId")
                         .HasColumnType("int");

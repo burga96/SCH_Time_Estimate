@@ -112,6 +112,32 @@ namespace Core.ApplicationServices.ApplicationServices
             return new WalletDTO(wallet);
         }
 
+        public async Task<WalletDTO> ActivateWallet(int walletId)
+        {
+            Wallet wallet = await _unitOfWork.WalletRepository.GetById(walletId);
+            if (wallet == null)
+            {
+                throw new ArgumentException($"Wallet with {walletId} doesn't exist");
+            }
+            wallet.Activate();
+            await _unitOfWork.WalletRepository.Update(wallet);
+            await _unitOfWork.SaveChangesAsync();
+            return new WalletDTO(wallet);
+        }
+
+        public async Task<WalletDTO> BlockWallet(int walletId)
+        {
+            Wallet wallet = await _unitOfWork.WalletRepository.GetById(walletId);
+            if (wallet == null)
+            {
+                throw new ArgumentException($"Wallet with {walletId} doesn't exist");
+            }
+            wallet.Block();
+            await _unitOfWork.WalletRepository.Update(wallet);
+            await _unitOfWork.SaveChangesAsync();
+            return new WalletDTO(wallet);
+        }
+
         private async Task<Wallet> CheckForWallet(string uniqueMasterCitizenNumberValue, string password)
         {
             Wallet wallet = await _unitOfWork.WalletRepository.GetFirstWithIncludes(Wallet =>

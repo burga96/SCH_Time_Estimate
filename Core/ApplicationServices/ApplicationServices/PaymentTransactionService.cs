@@ -2,6 +2,7 @@
 using Core.ApplicationServices.ApplicationExceptions;
 using Core.ApplicationServices.ApplicationServiceInterfaces;
 using Core.Domain.Entities;
+using Core.Domain.Exceptions;
 using Core.Domain.ExternalInterfaces;
 using Core.Domain.RepositoryInterfaces;
 using System;
@@ -34,6 +35,7 @@ namespace Core.ApplicationServices.ApplicationServices
             {
                 throw new BankAPIException("Bank api - failed to withdrawal");
             }
+
             DepositPaymentTransaction depositPaymentTransaction = wallet.MakeDepositTransaction(amount);
             await _unitOfWork.PaymentTransactionRepository.Insert(depositPaymentTransaction);
             await _unitOfWork.SaveChangesAsync();

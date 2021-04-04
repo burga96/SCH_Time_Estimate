@@ -45,5 +45,21 @@ namespace Core.ApplicationServices.IntegrationTests.WalletsService
             //Act & Assert
             ExceptionAssert.Throws<InvalidNewPasswordException>(() => _walletService.ChangePassword(wallet.UniqueMasterCitizenNumber, wallet.Password, newPassword).Wait());
         }
+
+        [DataRow("061213")]
+        [DataRow("061214")]
+        [DataRow("061215")]
+        [DataTestMethod]
+        public async Task ChangedPasswordWhenWalletIsBlocked(string newPassword)
+        {
+            //Arrange
+            WalletDTO wallet = await ArrangeWallet();
+            await _walletService.BlockWallet(wallet.Id);
+
+            //Act & Assert
+            ExceptionAssert.Throws<WalletStatusException>(() =>
+              _walletService.ChangePassword(wallet.UniqueMasterCitizenNumber, wallet.Password, newPassword).Wait()
+           );
+        }
     }
 }

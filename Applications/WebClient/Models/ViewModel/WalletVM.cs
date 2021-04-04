@@ -1,4 +1,5 @@
 ﻿using Core.ApplicationServices.ApplicationDTOs;
+using Core.Domain.Entities.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -21,6 +22,7 @@ namespace Applications.WebClient.Models.ViewModel
             CurrentAmount = wallet.CurrentAmount;
             SupportedBankId = wallet.SupportedBankId;
             SupportedBankName = wallet.SupportedBankName;
+            Status = wallet.Status;
         }
 
         public WalletVM()
@@ -54,6 +56,7 @@ namespace Applications.WebClient.Models.ViewModel
         public string SupportedBankName { get; set; }
 
         public string Password { get; set; }
+        public WalletStatus Status { get; set; }
     }
 
     public static partial class WalletExtensionMethods

@@ -21,5 +21,9 @@ namespace Core.ApplicationServices.ApplicationServiceInterfaces
         Task<WalletDTO> GetWalletByUniqueMasterCitizenNumberAndPassword(string uniqueMasterCitizenNumber, string password);
 
         Task<WalletDTO> ChangePassword(string uniqueMasterCitizenNumber, string password, string newPassword);
+
+        Task<WalletDTO> ActivateWallet(int walletId);
+
+        Task<WalletDTO> BlockWallet(int walletId);
     }
 }

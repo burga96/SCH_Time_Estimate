@@ -32,7 +32,8 @@ namespace Core.Infrastructure.DataAccess.Migrations
                     PersonalData_FirstName = table.Column<string>(nullable: true),
                     PersonalData_LastName = table.Column<string>(nullable: true),
                     SupportedBankId = table.Column<int>(nullable: false),
-                    Password = table.Column<string>(nullable: false)
+                    Password = table.Column<string>(nullable: false),
+                    Status = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
