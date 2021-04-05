@@ -1,5 +1,6 @@
 ﻿using Core.Domain.Entities.Enums;
 using Core.Domain.Exceptions;
+using Core.Domain.Helpers;
 using Core.Domain.ValueObjects;
 using System;
 using System.Collections.Generic;
@@ -27,6 +28,7 @@ namespace Core.Domain.Entities
             Password = password;
             PostalIndexNumber = postalIndexNumber;
             Status = WalletStatus.ACTIVE;
+            CreatedAt = DateTime.Now;
             PaymentTransactions = new List<PaymentTransaction>();
         }
 
@@ -40,6 +42,28 @@ namespace Core.Domain.Entities
         public string Password { get; private set; }
         public ICollection<PaymentTransaction> PaymentTransactions { get; private set; }
         public WalletStatus Status { get; private set; }
+        public DateTime CreatedAt { get; private set; }
+
+        public IEnumerable<InternalTransferPaymentTransaction> InternalTransferPaymentTransactions
+        {
+            get
+            {
+                return PaymentTransactions.Where(PaymentTransaction => PaymentTransaction is InternalTransferPaymentTransaction)
+                    .Select(PaymentTransaction => (InternalTransferPaymentTransaction)PaymentTransaction)
+                    .ToList();
+            }
+        }
+
+        public int NumberOfPaymentTransactionOnSpecificMonth(DateTime date)
+        {
+            int numberOfPaymentTransactionOnSpecificMonth = InternalTransferPaymentTransactions
+                .Where(PaymentTransaction =>
+                   PaymentTransaction.DateCreated.Year == date.Year
+                   && PaymentTransaction.DateCreated.Month == date.Month
+                )
+                .Count();
+            return numberOfPaymentTransactionOnSpecificMonth;
+        }
 
         public void CheckIfWalletIsBlocked()
         {
@@ -103,6 +127,31 @@ namespace Core.Domain.Entities
                 throw new WalletStatusException("Cannot block wallet because it is not active");
             }
             Status = WalletStatus.BLOCKED;
+        }
+
+        public InternalTransferPaymentTransactions MakeInternalTransfer(Wallet toWallet, decimal amount)
+        {
+            CheckIfWalletIsBlocked();
+            decimal feeAmount = FeeCalculator.CalculateFee(this, amount);
+            if (CurrentAmount < amount + feeAmount)
+            {
+                throw new NotEnoughAmountException();
+            }
+            string internalTransferId = Guid.NewGuid().ToString();
+            var deposit = new DepositInternalTransferPaymentTransaction(toWallet, this, amount, internalTransferId);
+            var withdrawal = new WithdrawalInternalTransferPaymentTransaction(this, toWallet, amount, internalTransferId);
+            FeeInternalTransferPaymentTransaction feePaymentTransaction = new FeeInternalTransferPaymentTransaction(this, toWallet, feeAmount, internalTransferId);
+            this.CurrentAmount -= amount;
+            toWallet.CurrentAmount += amount;
+            PaymentTransactions.Add(withdrawal);
+            toWallet.PaymentTransactions.Add(deposit);
+            var internalTransferPaymentTransactions = new InternalTransferPaymentTransactions(deposit, withdrawal, feePaymentTransaction);
+            if (internalTransferPaymentTransactions.HasFee())
+            {
+                this.CurrentAmount -= feeAmount;
+                PaymentTransactions.Add(feePaymentTransaction);
+            }
+            return internalTransferPaymentTransactions;
         }
     }
 }

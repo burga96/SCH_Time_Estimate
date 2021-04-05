@@ -33,7 +33,8 @@ namespace Core.Infrastructure.DataAccess.Migrations
                     PersonalData_LastName = table.Column<string>(nullable: true),
                     SupportedBankId = table.Column<int>(nullable: false),
                     Password = table.Column<string>(nullable: false),
-                    Status = table.Column<int>(nullable: false)
+                    Status = table.Column<int>(nullable: false),
+                    CreatedAt = table.Column<DateTime>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -68,7 +69,7 @@ namespace Core.Infrastructure.DataAccess.Migrations
                         column: x => x.SecondWalletId,
                         principalTable: "Wallets",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_PaymentTransactions_Wallets_WalletId",
                         column: x => x.WalletId,

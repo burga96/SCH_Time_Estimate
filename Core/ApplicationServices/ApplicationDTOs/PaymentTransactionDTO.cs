@@ -44,6 +44,9 @@ namespace Core.ApplicationServices.ApplicationDTOs
 
                 case PaymentTransactionType.INTERNAL_TRANSFER_WITHDRAWAL:
                     return new WithdrawalInternalTransferPaymentTransactionDTO((WithdrawalInternalTransferPaymentTransaction)paymentTransaction);
+
+                case PaymentTransactionType.FEE:
+                    return new FeeInternalTransferPaymentTransactionDTO((FeeInternalTransferPaymentTransaction)paymentTransaction);
             }
 
             return null;

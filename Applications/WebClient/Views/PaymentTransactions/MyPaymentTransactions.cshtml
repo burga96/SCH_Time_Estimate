@@ -80,13 +80,13 @@ else
             {
                 <tr>
                     <td>
-                        @if (item.Type == PaymentTransactionType.DEPOSIT || item.Type == PaymentTransactionType.INTERNAL_TRANSFER_DEPOSIT)
+                        @if (item.IsDeposit)
                         {
                             <div class="text-success">
                                 +@Html.DisplayFor(modelItem => item.Amount)
                             </div>
                         }
-                        @if (item.Type == PaymentTransactionType.WITHDRAWAL || item.Type == PaymentTransactionType.INTERNAL_TRANSFER_WITHDRAWAL)
+                        @if (item.IsWithdrawal)
                         {
                             <div class="text-danger">
                                 -@Html.DisplayFor(modelItem => item.Amount)
@@ -100,10 +100,9 @@ else
                         @Html.DisplayFor(modelItem => item.DateCreated)
                     </td>
                     <td>
-                        @if (item.Type == PaymentTransactionType.INTERNAL_TRANSFER_WITHDRAWAL || item.Type == PaymentTransactionType.INTERNAL_TRANSFER_DEPOSIT)
+                        @if (item.IsInternal)
                         {
                             @Html.DisplayFor(modelItem => ((InternalTransferPaymentTransactionVM)item).SecondWallet.UniqueMasterCitizenNumber)
-
                         }
                     </td>
                 </tr>

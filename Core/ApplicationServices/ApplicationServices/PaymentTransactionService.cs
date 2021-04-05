@@ -5,6 +5,7 @@ using Core.Domain.Entities;
 using Core.Domain.Exceptions;
 using Core.Domain.ExternalInterfaces;
 using Core.Domain.RepositoryInterfaces;
+using Core.Domain.ValueObjects;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -65,8 +66,9 @@ namespace Core.ApplicationServices.ApplicationServices
         {
             Wallet fromWallet = await CheckForWallet(fromUniqueMasterCitizenNumber, password);
             Wallet toWallet = await _unitOfWork.WalletRepository
-                .GetFirstOrDefault(Wallet =>
-                   Wallet.UniqueMasterCitizenNumber.Value == toUniqueMasterCitizenNumber
+                .GetFirstWithIncludes(Wallet =>
+                   Wallet.UniqueMasterCitizenNumber.Value == toUniqueMasterCitizenNumber,
+                   Wallet => Wallet.PaymentTransactions
             );
             if (toWallet == null)
             {
@@ -85,12 +87,13 @@ namespace Core.ApplicationServices.ApplicationServices
             {
                 throw new BankAPIException("Bank api - failed to deposit");
             }
-            //calculate fee
-            string internalTransferId = Guid.NewGuid().ToString();
-            var deposit = new DepositInternalTransferPaymentTransaction(toWallet, fromWallet, amount, internalTransferId);
-            var withdrawal = new WithdrawalInternalTransferPaymentTransaction(fromWallet, toWallet, amount, internalTransferId);
-            await _unitOfWork.PaymentTransactionRepository.Insert(deposit);
-            await _unitOfWork.PaymentTransactionRepository.Insert(withdrawal);
+            InternalTransferPaymentTransactions paymentTransactions = fromWallet.MakeInternalTransfer(toWallet, amount);
+            await _unitOfWork.PaymentTransactionRepository.Insert(paymentTransactions.Deposit);
+            await _unitOfWork.PaymentTransactionRepository.Insert(paymentTransactions.Withdrawal);
+            if (paymentTransactions.HasFee())
+            {
+                await _unitOfWork.PaymentTransactionRepository.Insert(paymentTransactions.Fee);
+            }
             await _unitOfWork.SaveChangesAsync();
         }
 
@@ -107,8 +110,7 @@ namespace Core.ApplicationServices.ApplicationServices
                 {
                     await _unitOfWork.WalletRepository.GetById(((InternalTransferPaymentTransaction)paymentTransaction).SecondWalletId);
                 }
-                if (((from != null && paymentTransaction.DateCreated >= from) || (from == null)) &&
-                    ((to != null && paymentTransaction.DateCreated <= to) || (to == null)))
+                if (paymentTransaction.IsInDateTimeScope(from, to))
                 {
                     filteredTransactions.Add(paymentTransaction);
                 }

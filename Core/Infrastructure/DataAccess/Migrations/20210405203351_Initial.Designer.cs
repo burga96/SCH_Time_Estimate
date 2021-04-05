@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Core.Infrastructure.DataAccess.Migrations
 {
     [DbContext(typeof(TimeEstimateDBContext))]
-    [Migration("20210405182148_Initial")]
+    [Migration("20210405203351_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -75,6 +75,9 @@ namespace Core.Infrastructure.DataAccess.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<decimal>("CurrentAmount")
                         .HasColumnType("decimal(18,2)");
 
@@ -118,6 +121,21 @@ namespace Core.Infrastructure.DataAccess.Migrations
                     b.HasBaseType("Core.Domain.Entities.PaymentTransaction");
 
                     b.HasDiscriminator().HasValue("DepositPaymentTransaction");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.FeeInternalTransferPaymentTransaction", b =>
+                {
+                    b.HasBaseType("Core.Domain.Entities.PaymentTransaction");
+
+                    b.Property<string>("InternalTransferId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("SecondWalletId")
+                        .HasColumnType("int");
+
+                    b.HasIndex("SecondWalletId");
+
+                    b.HasDiscriminator().HasValue("FeeInternalTransferPaymentTransaction");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.WithdrawalInternalTransferPaymentTransaction", b =>
@@ -204,6 +222,15 @@ namespace Core.Infrastructure.DataAccess.Migrations
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.DepositInternalTransferPaymentTransaction", b =>
+                {
+                    b.HasOne("Core.Domain.Entities.Wallet", "SecondWallet")
+                        .WithMany()
+                        .HasForeignKey("SecondWalletId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.FeeInternalTransferPaymentTransaction", b =>
                 {
                     b.HasOne("Core.Domain.Entities.Wallet", "SecondWallet")
                         .WithMany()

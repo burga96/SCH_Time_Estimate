@@ -26,5 +26,11 @@ namespace Core.Domain.Entities
         public decimal Amount { get; private set; }
         public DateTime DateCreated { get; private set; }
         public PaymentTransactionType Type { get; private set; }
+
+        public bool IsInDateTimeScope(DateTime? from, DateTime? to)
+        {
+            return ((from != null && DateCreated >= from) || (from == null)) &&
+                    ((to != null && DateCreated <= to) || (to == null));
+        }
     }
 }

@@ -31,6 +31,7 @@ namespace Core.Infrastructure.DataAccess.Contexts
             modelBuilder.ApplyConfiguration(new WithdrawalPaymentTransactionConfiguration());
             modelBuilder.ApplyConfiguration(new DepositInternalTransferPaymentTransactionConfiguration());
             modelBuilder.ApplyConfiguration(new WithdrawalInternalTransferPaymentTransactionConfiguration());
+            modelBuilder.ApplyConfiguration(new FeeInternalTransferPaymentTransactionConfiguration());
         }
     }
 }
