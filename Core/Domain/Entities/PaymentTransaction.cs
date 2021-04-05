@@ -32,5 +32,10 @@ namespace Core.Domain.Entities
             return ((from != null && DateCreated >= from) || (from == null)) &&
                     ((to != null && DateCreated <= to) || (to == null));
         }
+
+        public bool IsInSpecificMonth(DateTime date)
+        {
+            return DateCreated.Year == date.Year && DateCreated.Month == date.Month;
+        }
     }
 }

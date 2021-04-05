@@ -54,6 +54,46 @@ namespace Core.Domain.Entities
             }
         }
 
+        public IEnumerable<PaymentTransaction> AllDepositPaymentTransactions
+        {
+            get
+            {
+                return PaymentTransactions.Where(PaymentTransaction =>
+                    PaymentTransaction.Type == PaymentTransactionType.DEPOSIT &&
+                    PaymentTransaction.Type == PaymentTransactionType.INTERNAL_TRANSFER_DEPOSIT
+                ).ToList();
+            }
+        }
+
+        public IEnumerable<PaymentTransaction> AllWithdrawalPaymentTransactions
+        {
+            get
+            {
+                return PaymentTransactions.Where(PaymentTransaction =>
+                    PaymentTransaction.Type == PaymentTransactionType.WITHDRAWAL &&
+                    PaymentTransaction.Type == PaymentTransactionType.INTERNAL_TRANSFER_WITHDRAWAL
+                ).ToList();
+            }
+        }
+
+        public decimal DepositPaymentTransactionsSum(DateTime date)
+        {
+            decimal sum = AllDepositPaymentTransactions
+                .Where(PaymentTransaction => PaymentTransaction.IsInSpecificMonth(date))
+                .Select(PaymentTransaction => PaymentTransaction.Amount)
+                .Sum();
+            return sum;
+        }
+
+        public decimal WithdrawalPaymentTransactionsSum(DateTime date)
+        {
+            decimal sum = AllWithdrawalPaymentTransactions
+                .Where(PaymentTransaction => PaymentTransaction.IsInSpecificMonth(date))
+                .Select(PaymentTransaction => PaymentTransaction.Amount)
+                .Sum();
+            return sum;
+        }
+
         public int NumberOfPaymentTransactionOnSpecificMonth(DateTime date)
         {
             int numberOfPaymentTransactionOnSpecificMonth = InternalTransferPaymentTransactions
@@ -81,6 +121,11 @@ namespace Core.Domain.Entities
         public DepositPaymentTransaction MakeDepositTransaction(decimal depositAmount)
         {
             CheckIfWalletIsBlocked();
+            bool isLimitExceeded = LimitPaymentTransactionCalculator.IsLimitExceed(this);
+            if (isLimitExceeded)
+            {
+                throw new LimitExceededException();
+            }
             var depositPaymentTransaction = new DepositPaymentTransaction(this, depositAmount);
             PaymentTransactions.Add(depositPaymentTransaction);
             CurrentAmount += depositAmount;
@@ -93,6 +138,11 @@ namespace Core.Domain.Entities
             if (CurrentAmount < withdrawalAmount)
             {
                 throw new NotEnoughAmountException();
+            }
+            bool isLimitExceeded = LimitPaymentTransactionCalculator.IsLimitExceed(this);
+            if (isLimitExceeded)
+            {
+                throw new LimitExceededException();
             }
             CurrentAmount -= withdrawalAmount;
             var withdrawalPaymentTransaction = new WithdrawalPaymentTransaction(this, withdrawalAmount);
@@ -136,6 +186,11 @@ namespace Core.Domain.Entities
             if (CurrentAmount < amount + feeAmount)
             {
                 throw new NotEnoughAmountException();
+            }
+            bool isLimitExceeded = LimitPaymentTransactionCalculator.IsLimitExceed(this);
+            if (isLimitExceeded)
+            {
+                throw new LimitExceededException();
             }
             string internalTransferId = Guid.NewGuid().ToString();
             var deposit = new DepositInternalTransferPaymentTransaction(toWallet, this, amount, internalTransferId);
