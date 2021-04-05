@@ -38,6 +38,12 @@ namespace Core.ApplicationServices.ApplicationDTOs
 
                 case PaymentTransactionType.WITHDRAWAL:
                     return new WithdrawalPaymentTransactionDTO((WithdrawalPaymentTransaction)paymentTransaction);
+
+                case PaymentTransactionType.INTERNAL_TRANSFER_DEPOSIT:
+                    return new DepositInternalTransferPaymentTransactionDTO((DepositInternalTransferPaymentTransaction)paymentTransaction);
+
+                case PaymentTransactionType.INTERNAL_TRANSFER_WITHDRAWAL:
+                    return new WithdrawalInternalTransferPaymentTransactionDTO((WithdrawalInternalTransferPaymentTransaction)paymentTransaction);
             }
 
             return null;

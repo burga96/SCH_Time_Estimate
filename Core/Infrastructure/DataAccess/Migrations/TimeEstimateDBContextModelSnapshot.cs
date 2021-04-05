@@ -96,11 +96,41 @@ namespace Core.Infrastructure.DataAccess.Migrations
                     b.ToTable("Wallets");
                 });
 
+            modelBuilder.Entity("Core.Domain.Entities.DepositInternalTransferPaymentTransaction", b =>
+                {
+                    b.HasBaseType("Core.Domain.Entities.PaymentTransaction");
+
+                    b.Property<string>("InternalTransferId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("SecondWalletId")
+                        .HasColumnType("int");
+
+                    b.HasIndex("SecondWalletId");
+
+                    b.HasDiscriminator().HasValue("DepositInternalTransferPaymentTransaction");
+                });
+
             modelBuilder.Entity("Core.Domain.Entities.DepositPaymentTransaction", b =>
                 {
                     b.HasBaseType("Core.Domain.Entities.PaymentTransaction");
 
                     b.HasDiscriminator().HasValue("DepositPaymentTransaction");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.WithdrawalInternalTransferPaymentTransaction", b =>
+                {
+                    b.HasBaseType("Core.Domain.Entities.PaymentTransaction");
+
+                    b.Property<string>("InternalTransferId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("SecondWalletId")
+                        .HasColumnType("int");
+
+                    b.HasIndex("SecondWalletId");
+
+                    b.HasDiscriminator().HasValue("WithdrawalInternalTransferPaymentTransaction");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.WithdrawalPaymentTransaction", b =>
@@ -115,7 +145,7 @@ namespace Core.Infrastructure.DataAccess.Migrations
                     b.HasOne("Core.Domain.Entities.Wallet", "Wallet")
                         .WithMany("PaymentTransactions")
                         .HasForeignKey("WalletId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
 
@@ -169,6 +199,24 @@ namespace Core.Infrastructure.DataAccess.Migrations
                             b1.WithOwner()
                                 .HasForeignKey("WalletId");
                         });
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.DepositInternalTransferPaymentTransaction", b =>
+                {
+                    b.HasOne("Core.Domain.Entities.Wallet", "SecondWallet")
+                        .WithMany()
+                        .HasForeignKey("SecondWalletId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.WithdrawalInternalTransferPaymentTransaction", b =>
+                {
+                    b.HasOne("Core.Domain.Entities.Wallet", "SecondWallet")
+                        .WithMany()
+                        .HasForeignKey("SecondWalletId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

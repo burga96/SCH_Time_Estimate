@@ -40,6 +40,30 @@ namespace BancaIntesaAPI
                 bank.Withdraw("2108996781057", "0612", 90) == Task.FromResult(true) &&
                 bank.Withdraw("2108996781057", "0612", 100) == Task.FromResult(true) &&
 
+                bank.Deposit("2108995781057", "0612", 5) == Task.FromResult(true) &&
+                bank.Deposit("2108995781057", "0612", 10) == Task.FromResult(true) &&
+                bank.Deposit("2108995781057", "0612", 20) == Task.FromResult(true) &&
+                bank.Deposit("2108995781057", "0612", 30) == Task.FromResult(true) &&
+                bank.Deposit("2108995781057", "0612", 40) == Task.FromResult(true) &&
+                bank.Deposit("2108995781057", "0612", 50) == Task.FromResult(true) &&
+                bank.Deposit("2108995781057", "0612", 60) == Task.FromResult(true) &&
+                bank.Deposit("2108995781057", "0612", 70) == Task.FromResult(true) &&
+                bank.Deposit("2108995781057", "0612", 80) == Task.FromResult(true) &&
+                bank.Deposit("2108995781057", "0612", 90) == Task.FromResult(true) &&
+                bank.Deposit("2108995781057", "0612", 100) == Task.FromResult(true) &&
+
+                bank.Withdraw("2108995781057", "0612", 5) == Task.FromResult(true) &&
+                bank.Withdraw("2108995781057", "0612", 10) == Task.FromResult(true) &&
+                bank.Withdraw("2108995781057", "0612", 20) == Task.FromResult(true) &&
+                bank.Withdraw("2108995781057", "0612", 30) == Task.FromResult(true) &&
+                bank.Withdraw("2108995781057", "0612", 40) == Task.FromResult(true) &&
+                bank.Withdraw("2108995781057", "0612", 50) == Task.FromResult(true) &&
+                bank.Withdraw("2108995781057", "0612", 60) == Task.FromResult(true) &&
+                bank.Withdraw("2108995781057", "0612", 70) == Task.FromResult(true) &&
+                bank.Withdraw("2108995781057", "0612", 80) == Task.FromResult(true) &&
+                bank.Withdraw("2108995781057", "0612", 90) == Task.FromResult(true) &&
+                bank.Withdraw("2108995781057", "0612", 100) == Task.FromResult(true) &&
+
                 bank.Deposit("2108996781057", "0612", 15) == Task.FromResult(false) &&
                 bank.Deposit("2108996781057", "0612", 25) == Task.FromResult(false) &&
                 bank.Deposit("2108996781057", "0612", 35) == Task.FromResult(false) &&

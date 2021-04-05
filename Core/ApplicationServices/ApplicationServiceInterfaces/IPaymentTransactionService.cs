@@ -18,6 +18,11 @@ namespace Core.ApplicationServices.ApplicationServiceInterfaces
             string password,
             decimal amount);
 
+        Task MakeInternalTransferPaymentTransaction(string fromUniqueMasterCitizenNumber,
+            string password,
+            string secondUniqueMasterCitizenNumber,
+            decimal amount);
+
         Task<WalletDTO> GetWalletWithFiltertedPaymentTransactionsForUser(string uniqueMasterCitizenNumberValue,
             string password,
             DateTime? from,

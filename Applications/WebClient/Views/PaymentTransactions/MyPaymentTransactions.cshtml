@@ -68,6 +68,11 @@ else
                         Date
                     </div>
                 </th>
+                <th>
+                    <div>
+                        Second wallet id
+                    </div>
+                </th>
             </tr>
         </thead>
         <tbody>
@@ -75,13 +80,13 @@ else
             {
                 <tr>
                     <td>
-                        @if (item.Type == Core.Domain.Entities.Enums.PaymentTransactionType.DEPOSIT)
+                        @if (item.Type == PaymentTransactionType.DEPOSIT || item.Type == PaymentTransactionType.INTERNAL_TRANSFER_DEPOSIT)
                         {
                             <div class="text-success">
                                 +@Html.DisplayFor(modelItem => item.Amount)
                             </div>
                         }
-                        @if (item.Type == Core.Domain.Entities.Enums.PaymentTransactionType.WITHDRAWAL)
+                        @if (item.Type == PaymentTransactionType.WITHDRAWAL || item.Type == PaymentTransactionType.INTERNAL_TRANSFER_WITHDRAWAL)
                         {
                             <div class="text-danger">
                                 -@Html.DisplayFor(modelItem => item.Amount)
@@ -93,6 +98,13 @@ else
                     </td>
                     <td>
                         @Html.DisplayFor(modelItem => item.DateCreated)
+                    </td>
+                    <td>
+                        @if (item.Type == PaymentTransactionType.INTERNAL_TRANSFER_WITHDRAWAL || item.Type == PaymentTransactionType.INTERNAL_TRANSFER_DEPOSIT)
+                        {
+                            @Html.DisplayFor(modelItem => ((InternalTransferPaymentTransactionVM)item).SecondWallet.UniqueMasterCitizenNumber)
+
+                        }
                     </td>
                 </tr>
             }

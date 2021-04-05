@@ -6,11 +6,13 @@
 
   <ItemGroup>
     <Content Remove="Views\PaymentTransactions\MakeDeposit.cshtml" />
+    <Content Remove="Views\PaymentTransactions\MakeInternal.cshtml" />
     <Content Remove="Views\PaymentTransactions\MakeWithdrawal.cshtml" />
     <Content Remove="Views\PaymentTransactions\MyPaymentTransactions.cshtml" />
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="Views\PaymentTransactions\MakeInternal.cshtml" />
     <None Include="Views\PaymentTransactions\MyPaymentTransactions.cshtml" />
     <None Include="Views\PaymentTransactions\MakeWithdrawal.cshtml" />
     <None Include="Views\PaymentTransactions\MakeDeposit.cshtml" />

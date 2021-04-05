@@ -101,6 +101,43 @@ namespace Applications.WebClient.Controllers
         }
 
         [HttpGet]
+        public async Task<IActionResult> MakeInternal(string password, string uniqueMasterCitizenNumber)
+        {
+            MakeInternalPaymentTransactionVM makeInternalPaymentTransactionVM;
+            try
+            {
+                WalletDTO wallet = await _walletService.GetWalletByUniqueMasterCitizenNumberAndPassword(uniqueMasterCitizenNumber, password);
+
+                makeInternalPaymentTransactionVM = new MakeInternalPaymentTransactionVM(wallet.CurrentAmount, uniqueMasterCitizenNumber, password, "", true, "");
+                return View(makeInternalPaymentTransactionVM);
+            }
+            catch (Exception)
+            {
+                makeInternalPaymentTransactionVM = new MakeInternalPaymentTransactionVM(0, uniqueMasterCitizenNumber, password, "Enter valid unique master citizen number and password", false, "");
+                return View(makeInternalPaymentTransactionVM);
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> MakeInternal(MakeInternalPaymentTransactionVM makeInternalPaymentTransaction)
+        {
+            try
+            {
+                await _paymentTransactionService.MakeInternalTransferPaymentTransaction(makeInternalPaymentTransaction.UniqueMasterCitizenNumber,
+                    makeInternalPaymentTransaction.Password, makeInternalPaymentTransaction.ToUniqueMasterCitizenNumber, makeInternalPaymentTransaction.Amount);
+
+                return RedirectToAction(nameof(MyPaymentTransactions),
+                    new { password = makeInternalPaymentTransaction.Password, uniqueMasterCitizenNumber = makeInternalPaymentTransaction.UniqueMasterCitizenNumber });
+            }
+            catch (Exception e)
+            {
+                ViewData["Error"] = e.Message;
+                return View(makeInternalPaymentTransaction);
+            }
+        }
+
+        [HttpGet]
         public async Task<IActionResult> MyPaymentTransactions(string password,
             string uniqueMasterCitizenNumber)
         {

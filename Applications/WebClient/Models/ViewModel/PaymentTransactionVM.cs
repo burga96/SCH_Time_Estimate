@@ -43,6 +43,12 @@ namespace Applications.WebClient.Models.ViewModel
 
                 case PaymentTransactionType.WITHDRAWAL:
                     return new WithdrawalPaymentTransactionVM((WithdrawalPaymentTransactionDTO)paymentTransaction);
+
+                case PaymentTransactionType.INTERNAL_TRANSFER_DEPOSIT:
+                    return new DepositInternalTransferPaymentTransactionVM((DepositInternalTransferPaymentTransactionDTO)paymentTransaction);
+
+                case PaymentTransactionType.INTERNAL_TRANSFER_WITHDRAWAL:
+                    return new WithdrawalInternalTransferPaymentTransactionVM((WithdrawalInternalTransferPaymentTransactionDTO)paymentTransaction);
             }
 
             return null;
