@@ -2,9 +2,20 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Core.ApplicationServices.ApplicationServiceInterfaces;
+using Core.ApplicationServices.ApplicationServices;
+using Core.ApplicationServices.ExternalInterfaces;
+using Core.Domain.ExternalInterfaces;
+using Core.Domain.RepositoryInterfaces;
+using Core.Domain.ValueObjects;
+using Core.Infrastructure.DataAccess.Contexts;
+using Core.Infrastructure.DataAccess.Repositories;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -23,11 +34,25 @@ namespace WebClient
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllersWithViews();
+            services.AddDbContextPool<TimeEstimateDBContext>(options =>
+                   options.UseSqlServer(Configuration.GetConnectionString("TimeEstimateDBConnection"))
+               );
+
+            services.AddScoped<IWalletService, WalletService>();
+            services.AddScoped<ISupportedBankService, SupportedBankService>();
+            services.AddScoped<IPaymentTransactionService, PaymentTransactionService>();
+            services.AddScoped<IBankAPIDeterminator, BankAPIDeterminator>();
+
+            services.AddScoped<IUnitOfWork, EfCoreUnitOfWork>();
+
+            services.AddControllersWithViews(options =>
+                options.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true
+            )
+            .AddRazorRuntimeCompilation();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, TimeEstimateDBContext context)
         {
             if (env.IsDevelopment())
             {
@@ -39,6 +64,7 @@ namespace WebClient
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+            context.GetInfrastructure().GetService<IMigrator>().Migrate();
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 

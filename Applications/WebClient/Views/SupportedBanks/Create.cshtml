@@ -1,0 +1,45 @@
+﻿@model Applications.WebClient.Models.ViewModel.SupportedBankVM
+
+@{
+    ViewData["Title"] = "Create supported banks";
+}
+
+<h4>Create supported bank</h4>
+
+@if (!Model.HasPassword)
+{
+    @await Html.PartialAsync("_Password", new Applications.WebClient.Models.ViewModel.PasswordVM(Model.Password, Model.Error, Model.HasPassword));
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4" style="float:left">
+            <form asp-action="Create" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="form-group" hidden="hidden">
+                    <input asp-for="Password" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label asp-for="Name" class="control-label"></label>
+                    <input asp-for="Name" class="form-control" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <input type="submit" value="Create new supported bank" class="btn btn-primary" />
+                </div>
+            </form>
+        </div>
+        <div class="col-md-4" style="float: left">
+            <a asp-action="Index">Back</a>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/js/dataView/State.js"></script>
+    <script src="~/js/dataView/dateView.js"></script>
+    <script>
+        InitializeDataView("", "", "", 0, "@Model.Password");
+    </script>
+}

@@ -8,38 +8,130 @@
     <link rel="stylesheet" href="~/css/site.css" />
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">WebClient</a>
-                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+
+    <div class="page-wrapper chiller-theme toggled">
+        <a id="show-sidebar" class="btn btn-sm btn-dark" href="#">
+            <i class="fas fa-bars"></i>
+        </a>
+        <nav id="sidebar" class="sidebar-wrapper">
+            <div class="sidebar-content">
+                <div class="sidebar-brand">
+                    <a href="#">SCH - Time estimate</a>
+                    <div id="close-sidebar">
+                        <i class="fas fa-times"></i>
+                    </div>
+                </div>
+                <div class="sidebar-header">
+                    <div class="user-pic">
+                        <img class="img-responsive img-rounded" src="https://raw.githubusercontent.com/azouaoui-med/pro-sidebar-template/gh-pages/src/img/user.jpg" alt="User picture">
+                    </div>
+                </div>
+                <!-- sidebar-header  -->
+                <div class="sidebar-search">
+                    <div>
+                        <div class="input-group">
+                            <input type="text" class="form-control search-menu" placeholder="Search...">
+                            <div class="input-group-append">
+                                <span class="input-group-text">
+                                    <i class="fa fa-search" aria-hidden="true"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- sidebar-search  -->
+                <div class="sidebar-menu">
+                    <ul>
+                        <li class="sidebar-dropdown">
+                            <a href="#">
+                                <span>Supported banks</span>
+                            </a>
+                            <div class="sidebar-submenu">
+                                <ul>
+                                    <li>
+                                        <a asp-area="" asp-controller="SupportedBanks" asp-action="Index">
+                                            Supported banks
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                        <li class="sidebar-dropdown">
+                            <a href="#">
+                                <span>Wallets</span>
+                            </a>
+                            <div class="sidebar-submenu">
+                                <ul>
+                                    <li>
+                                        <a asp-area="" asp-controller="Wallets" asp-action="Index">
+                                            Wallets
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a asp-area="" asp-controller="Wallets" asp-action="Create">
+                                            Create new wallet
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a asp-area="" asp-controller="Wallets" asp-action="ChangePassword">
+                                            Change password
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a asp-area="" asp-controller="Wallets" asp-action="Info">
+                                            Wallet info
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>
+
+                        <li class="sidebar-dropdown">
+                            <a href="#">
+                                <span>Transactions</span>
+                            </a>
+                            <div class="sidebar-submenu">
+                                <ul>
+                                    <li>
+                                        <a asp-area="" asp-controller="PaymentTransactions" asp-action="MakeDeposit">
+                                            Make Deposit on wallet
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a asp-area="" asp-controller="PaymentTransactions" asp-action="MakeWithdrawal">
+                                            Make Withdraw from wallet
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a asp-area="" asp-controller="PaymentTransactions" asp-action="MakeInternal">
+                                            Make internal transfer
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a asp-area="" asp-controller="PaymentTransactions" asp-action="MyPaymentTransactions">
+                                            My transactions
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a asp-area="" asp-controller="PaymentTransactions" asp-action="GetPaymentTransactionsByAdmin">
+                                            All transactions
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
                         </li>
                     </ul>
                 </div>
+                <!-- sidebar-menu  -->
             </div>
+            <!-- sidebar-content  -->
         </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
+        <main class="page-content">
+            <div>
+                @RenderBody()
+            </div>
         </main>
     </div>
-
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2021 - WebClient - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-        </div>
-    </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

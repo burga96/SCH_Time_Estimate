@@ -1,0 +1,59 @@
+﻿@model Applications.WebClient.Models.ViewModel.MakeDepositPaymentTransactionVM
+
+@{
+    ViewData["Title"] = "Make deposit on wallet";
+}
+
+<h4>Make deposit on wallet</h4>
+
+@if (!Model.Authenticated)
+{
+    @await Html.PartialAsync("_Authentication", new Applications.WebClient.Models.ViewModel.AuthenticationVM(Model.UniqueMasterCitizenNumber, Model.Password, Model.Error, Model.Authenticated));
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4" style="float:left">
+            <form asp-action="MakeDeposit" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="form-group" hidden="hidden">
+                    <input asp-for="Password" class="form-control" />
+                </div>
+                <div class="form-group" hidden="hidden">
+                    <input asp-for="UniqueMasterCitizenNumber" class="form-control" />
+                </div>
+                <div class="form-group" hidden="hidden">
+                    <input asp-for="Authenticated" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label asp-for="CurrentAmount" class="control-label"></label>
+                    <input asp-for="CurrentAmount" readonly class="form-control" />
+                    <span asp-validation-for="CurrentAmount" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Amount" class="control-label"></label>
+                    <input asp-for="Amount" class="form-control" />
+                    <span asp-validation-for="Amount" class="text-danger"></span>
+                </div>
+                <div class="text-danger">
+                    @ViewData["Error"]
+                </div>
+                <div class="form-group">
+                    <input type="submit" value="Make deposit" class="btn btn-primary" />
+                </div>
+            </form>
+        </div>
+        <div class="col-md-4" style="float: left">
+            <a asp-action="Index">Back</a>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/js/dataView/State.js"></script>
+    <script src="~/js/dataView/dateView.js"></script>
+    <script>
+        InitializeDataView("", "", "", 0, "@Model.Password", "@Model.UniqueMasterCitizenNumber");
+    </script>
+}
