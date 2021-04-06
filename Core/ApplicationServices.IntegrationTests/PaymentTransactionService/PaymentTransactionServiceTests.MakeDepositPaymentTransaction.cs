@@ -118,5 +118,24 @@ namespace Core.ApplicationServices.IntegrationTests.PaymentTransactionService
                _paymentTransactionService.MakeDepositPaymentTransaction(wallet.UniqueMasterCitizenNumber, wallet.Password, amount).Wait()
             );
         }
+
+        [TestMethod]
+        public async Task LimitExceededOnMakingDepoistPaymentTransaction()
+        {
+            //Arrange
+            decimal amount1 = 500000.0m;
+            decimal amount2 = 200000.0m;
+            decimal amount3 = 200000.0m;
+            decimal amount4 = 200000.0m;
+            WalletDTO wallet = await ArrangeWallet();
+            await _paymentTransactionService.MakeDepositPaymentTransaction(wallet.UniqueMasterCitizenNumber, wallet.Password, amount1);
+            await _paymentTransactionService.MakeDepositPaymentTransaction(wallet.UniqueMasterCitizenNumber, wallet.Password, amount2);
+            await _paymentTransactionService.MakeDepositPaymentTransaction(wallet.UniqueMasterCitizenNumber, wallet.Password, amount3);
+
+            //Act & Assert
+            ExceptionAssert.Throws<LimitExceededException>(() =>
+               _paymentTransactionService.MakeDepositPaymentTransaction(wallet.UniqueMasterCitizenNumber, wallet.Password, amount4).Wait()
+            );
+        }
     }
 }

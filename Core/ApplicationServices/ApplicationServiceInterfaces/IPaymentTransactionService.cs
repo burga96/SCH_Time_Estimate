@@ -18,7 +18,7 @@ namespace Core.ApplicationServices.ApplicationServiceInterfaces
             string password,
             decimal amount);
 
-        Task MakeInternalTransferPaymentTransaction(string fromUniqueMasterCitizenNumber,
+        Task<InternalTransferPaymentTransactionsDTO> MakeInternalTransferPaymentTransaction(string fromUniqueMasterCitizenNumber,
             string password,
             string secondUniqueMasterCitizenNumber,
             decimal amount);

@@ -30,13 +30,15 @@ namespace Core.ApplicationServices.ApplicationServices
         {
             Wallet wallet = await CheckForWallet(uniqueMasterCitizenNumber, password);
             IBankAPI bankAPI = _bankAPIDeterminator.DeterminateBankAPI(wallet.SupportedBank);
+            DepositPaymentTransaction depositPaymentTransaction = wallet.MakeDepositTransaction(amount);
+
             bool successWithdrawal = await bankAPI.Withdraw(uniqueMasterCitizenNumber, wallet.PostalIndexNumber, amount);
             if (!successWithdrawal)
             {
+                wallet.DeletePaymentTransaction(depositPaymentTransaction);
                 throw new BankAPIException("Bank api - failed to withdrawal");
             }
 
-            DepositPaymentTransaction depositPaymentTransaction = wallet.MakeDepositTransaction(amount);
             await _unitOfWork.PaymentTransactionRepository.Insert(depositPaymentTransaction);
             await _unitOfWork.SaveChangesAsync();
             return new DepositPaymentTransactionDTO(depositPaymentTransaction);
@@ -48,18 +50,18 @@ namespace Core.ApplicationServices.ApplicationServices
         {
             Wallet wallet = await CheckForWallet(uniqueMasterCitizenNumberValue, password);
             IBankAPI bankAPI = _bankAPIDeterminator.DeterminateBankAPI(wallet.SupportedBank);
+            WithdrawalPaymentTransaction withdrawalPaymentTransaction = wallet.MakeWithdrawalTransaction(amount);
             bool successDeposit = await bankAPI.Deposit(uniqueMasterCitizenNumberValue, wallet.PostalIndexNumber, amount);
             if (!successDeposit)
             {
                 throw new BankAPIException("Bank api - failed to deposit");
             }
-            WithdrawalPaymentTransaction withdrawalPaymentTransaction = wallet.MakeWithdrawalTransaction(amount);
             await _unitOfWork.PaymentTransactionRepository.Insert(withdrawalPaymentTransaction);
             await _unitOfWork.SaveChangesAsync();
             return new WithdrawalPaymentTransactionDTO(withdrawalPaymentTransaction);
         }
 
-        public async Task MakeInternalTransferPaymentTransaction(string fromUniqueMasterCitizenNumber,
+        public async Task<InternalTransferPaymentTransactionsDTO> MakeInternalTransferPaymentTransaction(string fromUniqueMasterCitizenNumber,
             string password,
             string toUniqueMasterCitizenNumber,
             decimal amount)
@@ -77,17 +79,20 @@ namespace Core.ApplicationServices.ApplicationServices
             IBankAPI bankAPI = _bankAPIDeterminator.DeterminateBankAPI(fromWallet.SupportedBank);
             IBankAPI secondBankAPI = _bankAPIDeterminator.DeterminateBankAPI(toWallet.SupportedBank);
 
+            InternalTransferPaymentTransactions paymentTransactions = fromWallet.MakeInternalTransfer(toWallet, amount);
+
             bool successWithdrawal = await bankAPI.Withdraw(fromUniqueMasterCitizenNumber, fromWallet.PostalIndexNumber, amount);
             if (!successWithdrawal)
             {
+                CleanupWallets(fromWallet, toWallet, paymentTransactions);
                 throw new BankAPIException("Bank api - failed to withdrawal");
             }
             bool successDeposit = await secondBankAPI.Withdraw(toUniqueMasterCitizenNumber, toWallet.PostalIndexNumber, amount);
             if (!successDeposit)
             {
+                CleanupWallets(fromWallet, toWallet, paymentTransactions);
                 throw new BankAPIException("Bank api - failed to deposit");
             }
-            InternalTransferPaymentTransactions paymentTransactions = fromWallet.MakeInternalTransfer(toWallet, amount);
             await _unitOfWork.PaymentTransactionRepository.Insert(paymentTransactions.Deposit);
             await _unitOfWork.PaymentTransactionRepository.Insert(paymentTransactions.Withdrawal);
             if (paymentTransactions.HasFee())
@@ -95,6 +100,14 @@ namespace Core.ApplicationServices.ApplicationServices
                 await _unitOfWork.PaymentTransactionRepository.Insert(paymentTransactions.Fee);
             }
             await _unitOfWork.SaveChangesAsync();
+            return new InternalTransferPaymentTransactionsDTO(paymentTransactions);
+        }
+
+        private void CleanupWallets(Wallet fromWallet, Wallet toWallet, InternalTransferPaymentTransactions paymentTransactions)
+        {
+            fromWallet.DeletePaymentTransaction(paymentTransactions.Withdrawal);
+            fromWallet.DeletePaymentTransaction(paymentTransactions.Fee);
+            toWallet.DeletePaymentTransaction(paymentTransactions.Deposit);
         }
 
         public async Task<WalletDTO> GetWalletWithFiltertedPaymentTransactionsForUser(string uniqueMasterCitizenNumberValue,
@@ -123,8 +136,8 @@ namespace Core.ApplicationServices.ApplicationServices
         {
             IEnumerable<PaymentTransaction> paymentTransactions = await _unitOfWork.PaymentTransactionRepository
                 .GetFilteredList(
-                 paymentTransaction => (((from != null && paymentTransaction.DateCreated >= from) || (from == null)) &&
-                    ((to != null && paymentTransaction.DateCreated <= to) || (to == null)))
+                    paymentTransaction => ((from != null && paymentTransaction.DateCreated >= from) || (from == null)) &&
+                    ((to != null && paymentTransaction.DateCreated <= to) || (to == null))
                 );
             return paymentTransactions.ToPaymentTransactionDTOs();
         }

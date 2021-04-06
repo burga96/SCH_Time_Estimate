@@ -41,44 +41,45 @@ namespace Core.Domain.Entities
         public SupportedBank SupportedBank { get; private set; }
         public string Password { get; private set; }
         public ICollection<PaymentTransaction> PaymentTransactions { get; private set; }
+
+        public void DeletePaymentTransaction(PaymentTransaction paymentTransaction)
+        {
+            if (!PaymentTransactions.Contains(paymentTransaction))
+            {
+                return;
+            }
+            PaymentTransactions.Remove(paymentTransaction);
+        }
+
         public WalletStatus Status { get; private set; }
         public DateTime CreatedAt { get; private set; }
 
-        public IEnumerable<InternalTransferPaymentTransaction> InternalTransferPaymentTransactions
+        public IEnumerable<InternalTransferPaymentTransaction> InternalTransferPaymentTransactions()
         {
-            get
-            {
-                return PaymentTransactions.Where(PaymentTransaction => PaymentTransaction is InternalTransferPaymentTransaction)
-                    .Select(PaymentTransaction => (InternalTransferPaymentTransaction)PaymentTransaction)
-                    .ToList();
-            }
+            return PaymentTransactions.Where(PaymentTransaction => PaymentTransaction is InternalTransferPaymentTransaction)
+                .Select(PaymentTransaction => (InternalTransferPaymentTransaction)PaymentTransaction)
+                .ToList();
         }
 
-        public IEnumerable<PaymentTransaction> AllDepositPaymentTransactions
+        public IEnumerable<PaymentTransaction> AllDepositPaymentTransactions()
         {
-            get
-            {
-                return PaymentTransactions.Where(PaymentTransaction =>
-                    PaymentTransaction.Type == PaymentTransactionType.DEPOSIT &&
-                    PaymentTransaction.Type == PaymentTransactionType.INTERNAL_TRANSFER_DEPOSIT
-                ).ToList();
-            }
+            return PaymentTransactions.Where(PaymentTransaction =>
+                PaymentTransaction.Type == PaymentTransactionType.DEPOSIT ||
+                PaymentTransaction.Type == PaymentTransactionType.INTERNAL_TRANSFER_DEPOSIT
+            ).ToList();
         }
 
-        public IEnumerable<PaymentTransaction> AllWithdrawalPaymentTransactions
+        public IEnumerable<PaymentTransaction> AllWithdrawalPaymentTransactions()
         {
-            get
-            {
-                return PaymentTransactions.Where(PaymentTransaction =>
-                    PaymentTransaction.Type == PaymentTransactionType.WITHDRAWAL &&
-                    PaymentTransaction.Type == PaymentTransactionType.INTERNAL_TRANSFER_WITHDRAWAL
-                ).ToList();
-            }
+            return PaymentTransactions.Where(PaymentTransaction =>
+                PaymentTransaction.Type == PaymentTransactionType.WITHDRAWAL ||
+                PaymentTransaction.Type == PaymentTransactionType.INTERNAL_TRANSFER_WITHDRAWAL
+            ).ToList();
         }
 
         public decimal DepositPaymentTransactionsSum(DateTime date)
         {
-            decimal sum = AllDepositPaymentTransactions
+            decimal sum = AllDepositPaymentTransactions()
                 .Where(PaymentTransaction => PaymentTransaction.IsInSpecificMonth(date))
                 .Select(PaymentTransaction => PaymentTransaction.Amount)
                 .Sum();
@@ -87,7 +88,7 @@ namespace Core.Domain.Entities
 
         public decimal WithdrawalPaymentTransactionsSum(DateTime date)
         {
-            decimal sum = AllWithdrawalPaymentTransactions
+            decimal sum = AllWithdrawalPaymentTransactions()
                 .Where(PaymentTransaction => PaymentTransaction.IsInSpecificMonth(date))
                 .Select(PaymentTransaction => PaymentTransaction.Amount)
                 .Sum();
@@ -96,7 +97,7 @@ namespace Core.Domain.Entities
 
         public int NumberOfPaymentTransactionOnSpecificMonth(DateTime date)
         {
-            int numberOfPaymentTransactionOnSpecificMonth = InternalTransferPaymentTransactions
+            int numberOfPaymentTransactionOnSpecificMonth = InternalTransferPaymentTransactions()
                 .Where(PaymentTransaction =>
                    PaymentTransaction.DateCreated.Year == date.Year
                    && PaymentTransaction.DateCreated.Month == date.Month
@@ -121,7 +122,7 @@ namespace Core.Domain.Entities
         public DepositPaymentTransaction MakeDepositTransaction(decimal depositAmount)
         {
             CheckIfWalletIsBlocked();
-            bool isLimitExceeded = LimitPaymentTransactionCalculator.IsLimitExceed(this);
+            bool isLimitExceeded = LimitPaymentTransactionCalculator.IsDepositLimitExceed(this, depositAmount);
             if (isLimitExceeded)
             {
                 throw new LimitExceededException();
@@ -135,14 +136,14 @@ namespace Core.Domain.Entities
         public WithdrawalPaymentTransaction MakeWithdrawalTransaction(decimal withdrawalAmount)
         {
             CheckIfWalletIsBlocked();
-            if (CurrentAmount < withdrawalAmount)
-            {
-                throw new NotEnoughAmountException();
-            }
-            bool isLimitExceeded = LimitPaymentTransactionCalculator.IsLimitExceed(this);
+            bool isLimitExceeded = LimitPaymentTransactionCalculator.IsWithdrawalLimitExceed(this, withdrawalAmount);
             if (isLimitExceeded)
             {
                 throw new LimitExceededException();
+            }
+            if (CurrentAmount < withdrawalAmount)
+            {
+                throw new NotEnoughAmountException();
             }
             CurrentAmount -= withdrawalAmount;
             var withdrawalPaymentTransaction = new WithdrawalPaymentTransaction(this, withdrawalAmount);
@@ -182,13 +183,19 @@ namespace Core.Domain.Entities
         public InternalTransferPaymentTransactions MakeInternalTransfer(Wallet toWallet, decimal amount)
         {
             CheckIfWalletIsBlocked();
+            toWallet.CheckIfWalletIsBlocked();
             decimal feeAmount = FeeCalculator.CalculateFee(this, amount);
             if (CurrentAmount < amount + feeAmount)
             {
                 throw new NotEnoughAmountException();
             }
-            bool isLimitExceeded = LimitPaymentTransactionCalculator.IsLimitExceed(this);
-            if (isLimitExceeded)
+            bool isWithdrawalLimitExceeded = LimitPaymentTransactionCalculator.IsWithdrawalLimitExceed(this, amount);
+            if (isWithdrawalLimitExceeded)
+            {
+                throw new LimitExceededException();
+            }
+            bool isDepositLimitExceeded = LimitPaymentTransactionCalculator.IsDepositLimitExceed(toWallet, amount);
+            if (isDepositLimitExceeded)
             {
                 throw new LimitExceededException();
             }

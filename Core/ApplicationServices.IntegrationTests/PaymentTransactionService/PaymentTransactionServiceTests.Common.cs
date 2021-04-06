@@ -58,5 +58,11 @@ namespace Core.ApplicationServices.IntegrationTests.PaymentTransactionService
             WalletDTO wallet = await _walletService.CreateNewWallet("2108996781057", "0612", 1, "Stefan", "Burgic");
             return wallet;
         }
+
+        public async Task<WalletDTO> ArrangeSecondWallet()
+        {
+            WalletDTO wallet = await _walletService.CreateNewWallet("2108995781057", "0612", 1, "Vukoman", "Stojanovic");
+            return wallet;
+        }
     }
 }
