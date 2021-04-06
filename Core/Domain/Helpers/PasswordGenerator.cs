@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Core.Domain.Factories
+namespace Core.Domain.Helpers
 {
     public static class PasswordGenerator
     {

@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Core.Infrastructure.DataAccess.Migrations
 {
     [DbContext(typeof(TimeEstimateDBContext))]
-    [Migration("20210404165754_Initial")]
+    [Migration("20210406075235_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -75,6 +75,9 @@ namespace Core.Infrastructure.DataAccess.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<decimal>("CurrentAmount")
                         .HasColumnType("decimal(18,2)");
 
@@ -98,11 +101,56 @@ namespace Core.Infrastructure.DataAccess.Migrations
                     b.ToTable("Wallets");
                 });
 
+            modelBuilder.Entity("Core.Domain.Entities.DepositInternalTransferPaymentTransaction", b =>
+                {
+                    b.HasBaseType("Core.Domain.Entities.PaymentTransaction");
+
+                    b.Property<string>("InternalTransferId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("SecondWalletId")
+                        .HasColumnType("int");
+
+                    b.HasIndex("SecondWalletId");
+
+                    b.HasDiscriminator().HasValue("DepositInternalTransferPaymentTransaction");
+                });
+
             modelBuilder.Entity("Core.Domain.Entities.DepositPaymentTransaction", b =>
                 {
                     b.HasBaseType("Core.Domain.Entities.PaymentTransaction");
 
                     b.HasDiscriminator().HasValue("DepositPaymentTransaction");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.FeeInternalTransferPaymentTransaction", b =>
+                {
+                    b.HasBaseType("Core.Domain.Entities.PaymentTransaction");
+
+                    b.Property<string>("InternalTransferId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("SecondWalletId")
+                        .HasColumnType("int");
+
+                    b.HasIndex("SecondWalletId");
+
+                    b.HasDiscriminator().HasValue("FeeInternalTransferPaymentTransaction");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.WithdrawalInternalTransferPaymentTransaction", b =>
+                {
+                    b.HasBaseType("Core.Domain.Entities.PaymentTransaction");
+
+                    b.Property<string>("InternalTransferId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("SecondWalletId")
+                        .HasColumnType("int");
+
+                    b.HasIndex("SecondWalletId");
+
+                    b.HasDiscriminator().HasValue("WithdrawalInternalTransferPaymentTransaction");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.WithdrawalPaymentTransaction", b =>
@@ -117,7 +165,7 @@ namespace Core.Infrastructure.DataAccess.Migrations
                     b.HasOne("Core.Domain.Entities.Wallet", "Wallet")
                         .WithMany("PaymentTransactions")
                         .HasForeignKey("WalletId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
 
@@ -171,6 +219,33 @@ namespace Core.Infrastructure.DataAccess.Migrations
                             b1.WithOwner()
                                 .HasForeignKey("WalletId");
                         });
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.DepositInternalTransferPaymentTransaction", b =>
+                {
+                    b.HasOne("Core.Domain.Entities.Wallet", "SecondWallet")
+                        .WithMany()
+                        .HasForeignKey("SecondWalletId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.FeeInternalTransferPaymentTransaction", b =>
+                {
+                    b.HasOne("Core.Domain.Entities.Wallet", "SecondWallet")
+                        .WithMany()
+                        .HasForeignKey("SecondWalletId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.WithdrawalInternalTransferPaymentTransaction", b =>
+                {
+                    b.HasOne("Core.Domain.Entities.Wallet", "SecondWallet")
+                        .WithMany()
+                        .HasForeignKey("SecondWalletId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

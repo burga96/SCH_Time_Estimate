@@ -11,9 +11,16 @@ namespace Core.Infrastructure.DataAccess.EntityConfigurations
     {
         public void Configure(EntityTypeBuilder<PaymentTransaction> builder)
         {
+            builder.HasOne(PaymentTransaction => PaymentTransaction.Wallet)
+                .WithMany(Wallet => Wallet.PaymentTransactions)
+                .OnDelete(DeleteBehavior.Restrict);
+
             builder.ToTable("PaymentTransactions")
                  .HasDiscriminator<string>("PaymentTransactionType")
-                 .HasValue<DepositPaymentTransaction>(nameof(DepositPaymentTransaction));
+                 .HasValue<DepositPaymentTransaction>(nameof(DepositPaymentTransaction))
+                 .HasValue<WithdrawalPaymentTransaction>(nameof(WithdrawalPaymentTransaction))
+                 .HasValue<DepositInternalTransferPaymentTransaction>(nameof(DepositInternalTransferPaymentTransaction))
+                 .HasValue<WithdrawalInternalTransferPaymentTransaction>(nameof(WithdrawalInternalTransferPaymentTransaction));
         }
     }
 }

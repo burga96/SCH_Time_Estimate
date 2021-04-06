@@ -12,7 +12,7 @@
 }
 else
 {
-    <a href="/SupportedBanks/Create?adminPassword=@((string)ViewBag.AdminPassword)">Create supported bank</a>
+    <a href="/SupportedBanks/Create?password=@((string)ViewBag.AdminPassword)">Create supported bank</a>
     @await Html.PartialAsync("_Searchbar", new Applications.WebClient.Models.ViewModel.FilterVM((string)ViewBag.Filter))
     <table class="table">
         <thead>

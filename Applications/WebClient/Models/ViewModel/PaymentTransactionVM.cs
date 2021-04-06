@@ -30,6 +30,35 @@ namespace Applications.WebClient.Models.ViewModel
         public decimal Amount { get; set; }
         public DateTime DateCreated { get; set; }
         public PaymentTransactionType Type { get; set; }
+
+        public bool IsDeposit
+        {
+            get
+            {
+                return Type == PaymentTransactionType.DEPOSIT ||
+                    Type == PaymentTransactionType.INTERNAL_TRANSFER_DEPOSIT;
+            }
+        }
+
+        public bool IsWithdrawal
+        {
+            get
+            {
+                return Type == PaymentTransactionType.WITHDRAWAL ||
+                    Type == PaymentTransactionType.INTERNAL_TRANSFER_WITHDRAWAL ||
+                    Type == PaymentTransactionType.FEE;
+            }
+        }
+
+        public bool IsInternal
+        {
+            get
+            {
+                return Type == PaymentTransactionType.INTERNAL_TRANSFER_DEPOSIT ||
+                    Type == PaymentTransactionType.INTERNAL_TRANSFER_WITHDRAWAL ||
+                    Type == PaymentTransactionType.FEE;
+            }
+        }
     }
 
     public static class PaymentTransactionExtensionMethods
@@ -43,6 +72,15 @@ namespace Applications.WebClient.Models.ViewModel
 
                 case PaymentTransactionType.WITHDRAWAL:
                     return new WithdrawalPaymentTransactionVM((WithdrawalPaymentTransactionDTO)paymentTransaction);
+
+                case PaymentTransactionType.INTERNAL_TRANSFER_DEPOSIT:
+                    return new DepositInternalTransferPaymentTransactionVM((DepositInternalTransferPaymentTransactionDTO)paymentTransaction);
+
+                case PaymentTransactionType.INTERNAL_TRANSFER_WITHDRAWAL:
+                    return new WithdrawalInternalTransferPaymentTransactionVM((WithdrawalInternalTransferPaymentTransactionDTO)paymentTransaction);
+
+                case PaymentTransactionType.FEE:
+                    return new FeeInternalTransferPaymentTransactionVM((FeeInternalTransferPaymentTransactionDTO)paymentTransaction);
             }
 
             return null;

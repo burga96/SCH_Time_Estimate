@@ -23,6 +23,7 @@ namespace Applications.WebClient.Models.ViewModel
             SupportedBankId = wallet.SupportedBankId;
             SupportedBankName = wallet.SupportedBankName;
             Status = wallet.Status;
+            CreatedAt = wallet.CreatedAt;
         }
 
         public WalletVM()
@@ -44,7 +45,10 @@ namespace Applications.WebClient.Models.ViewModel
         [DisplayName("Last name")]
         public string LastName { get; set; }
 
+        [DisplayName("Created at")]
         public string FullName { get; set; }
+
+        public DateTime CreatedAt { get; set; }
 
         [Required]
         public int SupportedBankId { get; set; }

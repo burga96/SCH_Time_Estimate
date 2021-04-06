@@ -37,6 +37,11 @@ else
             <tr>
                 <th class="sort-column-header">
                     <div class="column-header-name">
+                        @Html.DisplayNameFor(model => model.CreatedAt)
+                    </div>
+                </th>
+                <th class="sort-column-header">
+                    <div class="column-header-name">
                         @Html.DisplayNameFor(model => model.FirstName)
                     </div>
                 </th>
@@ -71,36 +76,39 @@ else
         <tbody>
             @foreach (var item in Model)
             {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.FirstName)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.LastName)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.UniqueMasterCitizenNumber)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.SupportedBankName)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.CurrentAmount)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Status)
-                </td>
-                <td>
-                    @if (item.Status == Core.Domain.Entities.Enums.WalletStatus.ACTIVE)
-                    {
-                        <a href="/Wallets/Block?password=@((string)ViewBag.AdminPassword)&id=@(item.Id)">Block</a>
-                    }
-                    else
-                    {
-                        <a href="/Wallets/Activate?password=@((string)ViewBag.AdminPassword)&id=@(item.Id)">Activate</a>
-                    }
-                </td>
-            </tr>
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.CreatedAt)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.FirstName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.LastName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.UniqueMasterCitizenNumber)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.SupportedBankName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.CurrentAmount)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Status)
+                    </td>
+                    <td>
+                        @if (item.Status == Core.Domain.Entities.Enums.WalletStatus.ACTIVE)
+                        {
+                            <a href="/Wallets/Block?password=@((string)ViewBag.AdminPassword)&id=@(item.Id)">Block</a>
+                        }
+                        else
+                        {
+                            <a href="/Wallets/Activate?password=@((string)ViewBag.AdminPassword)&id=@(item.Id)">Activate</a>
+                        }
+                    </td>
+                </tr>
             }
         </tbody>
     </table>

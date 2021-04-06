@@ -33,7 +33,8 @@ namespace Core.Infrastructure.DataAccess.Migrations
                     PersonalData_LastName = table.Column<string>(nullable: true),
                     SupportedBankId = table.Column<int>(nullable: false),
                     Password = table.Column<string>(nullable: false),
-                    Status = table.Column<int>(nullable: false)
+                    Status = table.Column<int>(nullable: false),
+                    CreatedAt = table.Column<DateTime>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -56,18 +57,31 @@ namespace Core.Infrastructure.DataAccess.Migrations
                     Amount = table.Column<decimal>(nullable: false),
                     DateCreated = table.Column<DateTime>(nullable: false),
                     Type = table.Column<int>(nullable: false),
-                    PaymentTransactionType = table.Column<string>(nullable: false)
+                    PaymentTransactionType = table.Column<string>(nullable: false),
+                    InternalTransferId = table.Column<string>(nullable: true),
+                    SecondWalletId = table.Column<int>(nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_PaymentTransactions", x => x.Id);
                     table.ForeignKey(
+                        name: "FK_PaymentTransactions_Wallets_SecondWalletId",
+                        column: x => x.SecondWalletId,
+                        principalTable: "Wallets",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
                         name: "FK_PaymentTransactions_Wallets_WalletId",
                         column: x => x.WalletId,
                         principalTable: "Wallets",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PaymentTransactions_SecondWalletId",
+                table: "PaymentTransactions",
+                column: "SecondWalletId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_PaymentTransactions_WalletId",

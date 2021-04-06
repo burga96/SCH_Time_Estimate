@@ -21,6 +21,7 @@ namespace Core.ApplicationServices.ApplicationDTOs
             CurrentAmount = wallet.CurrentAmount;
             SupportedBankId = wallet.SupportedBankId;
             Status = wallet.Status;
+            CreatedAt = wallet.CreatedAt;
             SupportedBankName = wallet.SupportedBank?.Name;
             PaymentTransactions = wallet.PaymentTransactions != null ? wallet.PaymentTransactions.ToPaymentTransactionDTOs() : new List<PaymentTransactionDTO>();
         }
@@ -36,6 +37,7 @@ namespace Core.ApplicationServices.ApplicationDTOs
             PostalIndexNumber = wallet.PostalIndexNumber;
             CurrentAmount = wallet.CurrentAmount;
             Status = wallet.Status;
+            CreatedAt = wallet.CreatedAt;
             SupportedBankId = wallet.SupportedBankId;
             SupportedBankName = wallet.SupportedBank?.Name;
             PaymentTransactions = paymentTransactions.ToPaymentTransactionDTOs();
@@ -54,6 +56,7 @@ namespace Core.ApplicationServices.ApplicationDTOs
         public string PostalIndexNumber { get; set; }
         public IEnumerable<PaymentTransactionDTO> PaymentTransactions { get; private set; }
         public WalletStatus Status { get; private set; }
+        public DateTime CreatedAt { get; private set; }
     }
 
     public static partial class WalletExtensionMethods
