@@ -45,15 +45,17 @@ namespace Applications.WebClient.Models.ViewModel
         [DisplayName("Last name")]
         public string LastName { get; set; }
 
-        [DisplayName("Created at")]
         public string FullName { get; set; }
-
+        [DisplayName("Created at")]
         public DateTime CreatedAt { get; set; }
 
+        
         [Required]
+        [DisplayName("Supported bank")]
         public int SupportedBankId { get; set; }
 
         [Required]
+        [DisplayName("Postal index number")]
         public string PostalIndexNumber { get; set; }
 
         [DisplayName("Supported bank")]
