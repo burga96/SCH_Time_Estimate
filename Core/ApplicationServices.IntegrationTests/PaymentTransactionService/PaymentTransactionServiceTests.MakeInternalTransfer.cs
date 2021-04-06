@@ -3,6 +3,7 @@ using Core.ApplicationServices.ApplicationExceptions;
 using Core.ApplicationServices.IntegrationTests.Common;
 using Core.Domain.Entities.Enums;
 using Core.Domain.Exceptions;
+using Core.Domain.Helpers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
@@ -202,6 +203,124 @@ namespace Core.ApplicationServices.IntegrationTests.PaymentTransactionService
                     amount4)
                .Wait()
             );
+        }
+
+        [TestMethod]
+        public async Task WithdrawalLimitExceededOnMakingInternalTransferPaymentTransaction()
+        {
+            //Arrange
+            decimal amount1 = 500000.0m;
+            decimal amount2 = 200000.0m;
+            decimal amount3 = 200000.0m;
+            decimal amount4 = 100000.0m;
+
+            WalletDTO wallet = await ArrangeWallet();
+            WalletDTO secondWallet = await ArrangeSecondWallet();
+
+            await _paymentTransactionService.MakeDepositPaymentTransaction(wallet.UniqueMasterCitizenNumber, wallet.Password, amount1);
+            await _paymentTransactionService.MakeDepositPaymentTransaction(wallet.UniqueMasterCitizenNumber, wallet.Password, amount2);
+            await _paymentTransactionService.MakeDepositPaymentTransaction(wallet.UniqueMasterCitizenNumber, wallet.Password, amount3);
+            await _paymentTransactionService.MakeDepositPaymentTransaction(wallet.UniqueMasterCitizenNumber, wallet.Password, amount4);
+            await _paymentTransactionService.MakeWithdrawalPaymentTransaction(wallet.UniqueMasterCitizenNumber, wallet.Password, amount1);
+            await _paymentTransactionService.MakeWithdrawalPaymentTransaction(wallet.UniqueMasterCitizenNumber, wallet.Password, amount2);
+            await _paymentTransactionService.MakeWithdrawalPaymentTransaction(wallet.UniqueMasterCitizenNumber, wallet.Password, amount3);
+            await _paymentTransactionService.MakeWithdrawalPaymentTransaction(wallet.UniqueMasterCitizenNumber, wallet.Password, amount4);
+
+            //Act & Assert
+            ExceptionAssert.Throws<LimitExceededException>(() =>
+               _paymentTransactionService.MakeInternalTransferPaymentTransaction(wallet.UniqueMasterCitizenNumber,
+                    wallet.Password,
+                    secondWallet.UniqueMasterCitizenNumber,
+                    amount4)
+               .Wait()
+            );
+        }
+
+        [DataRow(100000.0)]
+        [DataRow(200000.0)]
+        [DataRow(500000.0)]
+        [DataTestMethod]
+        public async Task NumberOfDaysWithoutFeeAfterMakeInternalTransfer(double d)
+        {
+            //Arrange
+            decimal amount = (decimal)d;
+            WalletDTO wallet = await ArrangeWallet();
+            WalletDTO secondWallet = await ArrangeSecondWallet();
+            await _paymentTransactionService.MakeDepositPaymentTransaction(wallet.UniqueMasterCitizenNumber, wallet.Password, amount);
+            //Act
+            InternalTransferPaymentTransactionsDTO paymentTransactions = await _paymentTransactionService.MakeInternalTransferPaymentTransaction(wallet.UniqueMasterCitizenNumber, wallet.Password, secondWallet.UniqueMasterCitizenNumber, amount);
+            //Assert
+            Assert.AreEqual(paymentTransactions.Fee.Amount, 0);
+            WalletDTO assertWallet = await _walletService.GetWalletByUniqueMasterCitizenNumberAndPassword(wallet.UniqueMasterCitizenNumber, wallet.Password);
+            Assert.AreEqual(assertWallet.PaymentTransactions.Count(), 2);
+        }
+
+        [DataRow(100000.0)]
+        [DataRow(200000.0)]
+        [DataRow(500000.0)]
+        [DataTestMethod]
+        public async Task FirstInternalTransferInMonthAfterMakeInternalTransfer(double d)
+        {
+            //Arrange
+            DateTime now = DateTime.Now;
+            DateTime monthBefore = now.AddMonths(-1);
+
+            decimal amount = (decimal)d;
+            WalletDTO wallet = await ArrangeWalletOnSpecificDateWithAmount(monthBefore, amount);
+            WalletDTO secondWallet = await ArrangeSecondWallet();
+            //Act
+            InternalTransferPaymentTransactionsDTO paymentTransactions = await _paymentTransactionService.MakeInternalTransferPaymentTransaction(wallet.UniqueMasterCitizenNumber, wallet.Password, secondWallet.UniqueMasterCitizenNumber, amount);
+            //Assert
+            Assert.AreEqual(paymentTransactions.Fee.Amount, 0);
+            WalletDTO assertWallet = await _walletService.GetWalletByUniqueMasterCitizenNumberAndPassword(wallet.UniqueMasterCitizenNumber, wallet.Password);
+            Assert.AreEqual(assertWallet.PaymentTransactions.Count(), 1);
+        }
+
+        [DataRow(10.0)]
+        [DataRow(20.0)]
+        [DataRow(30.0)]
+        [DataRow(40.0)]
+        [DataRow(50.0)]
+        [DataRow(60.0)]
+        [DataTestMethod]
+        public async Task FixedFeeAfterMakeInternalTransfer(double d)
+        {
+            //Arrange
+            DateTime now = DateTime.Now;
+            DateTime monthBefore = now.AddMonths(-1);
+
+            decimal amount = (decimal)d;
+            WalletDTO wallet = await ArrangeWalletOnSpecificDateWithAmount(monthBefore, 1000);
+            WalletDTO secondWallet = await ArrangeSecondWallet();
+            await _paymentTransactionService.MakeInternalTransferPaymentTransaction(wallet.UniqueMasterCitizenNumber, wallet.Password, secondWallet.UniqueMasterCitizenNumber, amount);
+            //Act
+            InternalTransferPaymentTransactionsDTO paymentTransactions = await _paymentTransactionService.MakeInternalTransferPaymentTransaction(wallet.UniqueMasterCitizenNumber, wallet.Password, secondWallet.UniqueMasterCitizenNumber, amount);
+            //Assert
+            Assert.AreEqual(paymentTransactions.Fee.Amount, FeeCalculator.FixedFee);
+            WalletDTO assertWallet = await _walletService.GetWalletByUniqueMasterCitizenNumberAndPassword(wallet.UniqueMasterCitizenNumber, wallet.Password);
+            Assert.AreEqual(assertWallet.PaymentTransactions.Count(), 3);
+        }
+
+        [DataRow(100000.0)]
+        [DataRow(200000.0)]
+        [DataRow(500000.0)]
+        [DataTestMethod]
+        public async Task FeePercentageAfterMakeInternalTransfer(double d)
+        {
+            //Arrange
+            DateTime now = DateTime.Now;
+            DateTime monthBefore = now.AddMonths(-1);
+
+            decimal amount = (decimal)d;
+            WalletDTO wallet = await ArrangeWalletOnSpecificDateWithAmount(monthBefore, 500000 * 3);
+            WalletDTO secondWallet = await ArrangeSecondWallet();
+            await _paymentTransactionService.MakeInternalTransferPaymentTransaction(wallet.UniqueMasterCitizenNumber, wallet.Password, secondWallet.UniqueMasterCitizenNumber, amount);
+            //Act
+            InternalTransferPaymentTransactionsDTO paymentTransactions = await _paymentTransactionService.MakeInternalTransferPaymentTransaction(wallet.UniqueMasterCitizenNumber, wallet.Password, secondWallet.UniqueMasterCitizenNumber, amount);
+            //Assert
+            Assert.AreEqual(paymentTransactions.Fee.Amount, amount * FeeCalculator.FeePercentage / 100);
+            WalletDTO assertWallet = await _walletService.GetWalletByUniqueMasterCitizenNumberAndPassword(wallet.UniqueMasterCitizenNumber, wallet.Password);
+            Assert.AreEqual(assertWallet.PaymentTransactions.Count(), 3);
         }
     }
 }

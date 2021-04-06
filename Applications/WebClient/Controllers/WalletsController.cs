@@ -99,6 +99,7 @@ namespace Applications.WebClient.Controllers
                     "Unique Master Citizen Number" => _wallet => _wallet.UniqueMasterCitizenNumber.Value,
                     "Supported bank" => _wallet => _wallet.SupportedBank.Name,
                     "Current amount" => _wallet => _wallet.CurrentAmount,
+                    "Created at" => _wallet => _wallet.CreatedAt,
 
                     _ => throw new NotImplementedException($"{nameof(columnName)} = {columnName}"),
                 };

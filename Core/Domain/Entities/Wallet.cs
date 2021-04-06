@@ -77,6 +77,16 @@ namespace Core.Domain.Entities
             ).ToList();
         }
 
+        public void AddAmount(decimal amount)
+        {
+            CurrentAmount += amount;
+        }
+
+        public void ChangeCreatedAtDate(DateTime date)
+        {
+            CreatedAt = date;
+        }
+
         public decimal DepositPaymentTransactionsSum(DateTime date)
         {
             decimal sum = AllDepositPaymentTransactions()
@@ -185,10 +195,6 @@ namespace Core.Domain.Entities
             CheckIfWalletIsBlocked();
             toWallet.CheckIfWalletIsBlocked();
             decimal feeAmount = FeeCalculator.CalculateFee(this, amount);
-            if (CurrentAmount < amount + feeAmount)
-            {
-                throw new NotEnoughAmountException();
-            }
             bool isWithdrawalLimitExceeded = LimitPaymentTransactionCalculator.IsWithdrawalLimitExceed(this, amount);
             if (isWithdrawalLimitExceeded)
             {
@@ -198,6 +204,10 @@ namespace Core.Domain.Entities
             if (isDepositLimitExceeded)
             {
                 throw new LimitExceededException();
+            }
+            if (CurrentAmount < amount + feeAmount)
+            {
+                throw new NotEnoughAmountException();
             }
             string internalTransferId = Guid.NewGuid().ToString();
             var deposit = new DepositInternalTransferPaymentTransaction(toWallet, this, amount, internalTransferId);
